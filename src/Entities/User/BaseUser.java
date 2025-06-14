@@ -1,11 +1,11 @@
 package Entities.User;
 
+import Entities.Abstaract.BaseEntity;
 import Exceptions.UserValidationError;
 import org.mindrot.jbcrypt.BCrypt;
 import java.util.Objects;
 
-public abstract class BaseUser implements IEntity {
-    private Integer id;
+public abstract class BaseUser extends BaseEntity {
     private String TIN;
     private String passwordHash;
 
@@ -24,7 +24,7 @@ public abstract class BaseUser implements IEntity {
     }
 
     public BaseUser(Integer id, String TIN, String password) throws UserValidationError {
-        if (id == null) {
+        if (getId() == null) {
             throw new UserValidationError("id cannot be null or blank");
         }
         if (TIN == null || TIN.isBlank()) {
@@ -38,10 +38,6 @@ public abstract class BaseUser implements IEntity {
         this.passwordHash = PasswordUtils.hashPassword(password);
     }
 
-    @Override
-    public int getId() {
-        return id;
-    }
 
     public String getTIN() {
         return TIN;
@@ -85,7 +81,7 @@ public abstract class BaseUser implements IEntity {
     @Override
     public String toString() {
         return "BaseUser{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", TIN='" + TIN + '\'' +
                 ", passwordHash='" + passwordHash + '\'' +
                 '}';
@@ -100,6 +96,6 @@ public abstract class BaseUser implements IEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, TIN, passwordHash);
+        return Objects.hash(getId(), TIN, passwordHash);
     }
 }
