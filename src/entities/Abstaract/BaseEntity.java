@@ -1,4 +1,4 @@
-package Entities.Abstaract;
+package entities.Abstaract;
 
 public abstract class BaseEntity {
     protected Integer id;

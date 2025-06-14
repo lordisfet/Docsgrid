@@ -1,6 +1,6 @@
-import Entities.User.Employee;
-import Exceptions.ConsoleDriverException;
-import Exceptions.UserValidationError;
+import entities.User.Employee;
+import exceptions.ConsoleDriverException;
+import exceptions.UserValidationError;
 import menuAction.EmployeeMenuAction;
 import menuAction.GuestMenuAction;
 

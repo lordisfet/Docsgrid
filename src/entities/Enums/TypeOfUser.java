@@ -1,4 +1,4 @@
-package Entities.Enums;
+package entities.Enums;
 
 public enum TypeOfUser {
     EMPLOYEE,

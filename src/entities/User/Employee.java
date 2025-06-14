@@ -1,6 +1,6 @@
-package Entities.User;
+package entities.User;
 
-import Exceptions.UserValidationError;
+import exceptions.UserValidationError;
 
 public class Employee extends BaseUser {
     private String fullName;
