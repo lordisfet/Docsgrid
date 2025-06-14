@@ -7,8 +7,8 @@ public class Employee extends BaseUser {
     // TODO: private Company company;
     private String jobPosition;
 
-    public Employee(int id, String TIN, String fullName, String jobPosition) throws UserValidationError {
-        super(id, TypeOfUser.EMPLOYEE, TIN);
+    public Employee(String TIN, String passwordHash, String fullName, String jobPosition) throws UserValidationError {
+        super(TIN, passwordHash);
 
         if (fullName == null || fullName.isBlank()) {
             throw new UserValidationError("Full name cannot be null or blank");
@@ -47,7 +47,7 @@ public class Employee extends BaseUser {
 
     @Override
     public String toString() {
-        return "Employee{" +
+        return super.toString() + "Employee{" +
                 "fullName='" + fullName + '\'' +
                 ", jobPosition='" + jobPosition + '\'' +
                 '}';

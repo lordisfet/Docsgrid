@@ -1,33 +1,30 @@
 package Entities.User;
 
 import Exceptions.UserValidationError;
+import org.mindrot.jbcrypt.BCrypt;
+import java.util.Objects;
 
 public abstract class BaseUser implements IEntity {
-    private final int id;
-    private final TypeOfUser type;
+    private int id;
     private String TIN;
+    private String passwordHash;
 
-    public BaseUser(int id, TypeOfUser type, String TIN) throws UserValidationError {
+    public BaseUser(String TIN, String password) throws UserValidationError {
         // no constraints for id?
-        if (type == null) {
-            throw new UserValidationError("Type cannot be null");
-        }
         if (TIN == null || TIN.isBlank()) {
             throw new UserValidationError("TIN cannot be null or blank");
         }
+        if (password == null || password.isBlank()) {
+            throw new UserValidationError("passwordHash cannot be null or blank");
+        }
 
-        this.id = id;
-        this.type = type;
         this.TIN = TIN;
+        this.passwordHash = PasswordUtils.hashPassword(password);
     }
 
     @Override
     public int getId() {
         return id;
-    }
-
-    public TypeOfUser getType() {
-        return type;
     }
 
     public String getTIN() {
@@ -42,6 +39,24 @@ public abstract class BaseUser implements IEntity {
         this.TIN = TIN;
     }
 
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public static class PasswordUtils {
+        public static String hashPassword(String password) {
+            return BCrypt.hashpw(password, BCrypt.gensalt(12));
+        }
+
+        public static boolean verifyPassword(String password, String hashedPassword) {
+            return BCrypt.checkpw(password, hashedPassword);
+        }
+    }
+
     // TODO:
     // public abstract Document createDocument(repository?, docdraft?, map<string, string> data?, map<string(role), Signatory>?) {
     // repository.create()? }
@@ -50,12 +65,25 @@ public abstract class BaseUser implements IEntity {
     // public abstract List<Documents> getUnsignedDocuments(repository) { repository.getDocuments(where user is pending) }
     // public abstract Document declineDocument(repository, document)? {  repository.handleDecline()? }
 
+
     @Override
     public String toString() {
         return "BaseUser{" +
                 "id=" + id +
-                ", type=" + type +
                 ", TIN='" + TIN + '\'' +
+                ", passwordHash='" + passwordHash + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        BaseUser baseUser = (BaseUser) o;
+        return  Objects.equals(TIN, baseUser.TIN) && Objects.equals(passwordHash, baseUser.passwordHash);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, TIN, passwordHash);
     }
 }
