@@ -11,7 +11,6 @@ public abstract class BaseUser extends BaseEntity {
 
 
     public BaseUser(String TIN, String password) throws UserValidationError {
-        // no constraints for id?
         if (TIN == null || TIN.isBlank()) {
             throw new UserValidationError("TIN cannot be null or blank");
         }
@@ -24,7 +23,7 @@ public abstract class BaseUser extends BaseEntity {
     }
 
     public BaseUser(Integer id, String TIN, String password) throws UserValidationError {
-        if (getId() == null) {
+        if (id == null || id < 0) {
             throw new UserValidationError("id cannot be null or blank");
         }
         if (TIN == null || TIN.isBlank()) {
@@ -38,6 +37,7 @@ public abstract class BaseUser extends BaseEntity {
         this.passwordHash = PasswordUtils.hashPassword(password);
     }
 
+    // We don`t need copy-constructor? I guess no, because user with same all fields cannot exist
 
     public String getTIN() {
         return TIN;
@@ -81,7 +81,7 @@ public abstract class BaseUser extends BaseEntity {
     @Override
     public String toString() {
         return "BaseUser{" +
-                "id=" + getId() +
+                "id=" + id +
                 ", TIN='" + TIN + '\'' +
                 ", passwordHash='" + passwordHash + '\'' +
                 '}';
@@ -96,6 +96,6 @@ public abstract class BaseUser extends BaseEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), TIN, passwordHash);
+        return Objects.hash(id, TIN, passwordHash);
     }
 }
