@@ -1,4 +1,4 @@
-import entities.User.Employee;
+import entities.user.Employee;
 import exceptions.ConsoleDriverException;
 import exceptions.UserValidationError;
 import menuAction.EmployeeMenuAction;

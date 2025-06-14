@@ -1,4 +1,4 @@
-package entities.User;
+package entities.user;
 
 import exceptions.UserValidationError;
 

@@ -1,6 +1,6 @@
-package entities.User;
+package entities.user;
 
-import entities.Abstaract.BaseEntity;
+import entities.abstracts.BaseEntity;
 import exceptions.UserValidationError;
 import org.mindrot.jbcrypt.BCrypt;
 import java.util.Objects;
