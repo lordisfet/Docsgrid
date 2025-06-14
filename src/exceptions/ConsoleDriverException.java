@@ -1,4 +1,4 @@
-package Exceptions;
+package exceptions;
 
 public class ConsoleDriverException extends RuntimeException {
   public ConsoleDriverException(String message) {
