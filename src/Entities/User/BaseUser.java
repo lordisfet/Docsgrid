@@ -5,12 +5,28 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.util.Objects;
 
 public abstract class BaseUser implements IEntity {
-    private int id;
+    private Integer id;
     private String TIN;
     private String passwordHash;
 
+
     public BaseUser(String TIN, String password) throws UserValidationError {
         // no constraints for id?
+        if (TIN == null || TIN.isBlank()) {
+            throw new UserValidationError("TIN cannot be null or blank");
+        }
+        if (password == null || password.isBlank()) {
+            throw new UserValidationError("passwordHash cannot be null or blank");
+        }
+
+        this.TIN = TIN;
+        this.passwordHash = PasswordUtils.hashPassword(password);
+    }
+
+    public BaseUser(Integer id, String TIN, String password) throws UserValidationError {
+        if (id == null) {
+            throw new UserValidationError("id cannot be null or blank");
+        }
         if (TIN == null || TIN.isBlank()) {
             throw new UserValidationError("TIN cannot be null or blank");
         }
