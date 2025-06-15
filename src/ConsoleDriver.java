@@ -1,3 +1,4 @@
+import dao.CompanyDAO;
 import dao.EmployeeDAO;
 import entities.Company;
 import entities.user.Employee;
@@ -37,20 +38,24 @@ public class ConsoleDriver {
 
         do {
             System.out.println("\n----- Guest -----");
-            System.out.println("1) Register");
+            System.out.println("1) Sign up");
             System.out.println("2) Log in");
-            System.out.println("3) Exit\n");
+            System.out.println("3) Register Company");
+            System.out.println("4) Exit\n");
 
             action = GuestMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
-                case GuestMenuAction.REGISTER -> {
-                    registration();
+                case GuestMenuAction.SIGN_UP -> {
+                    registrationUser();
                 }
                 case GuestMenuAction.LOGIN -> {
                     // todo login
                     // authorizationMenu?
                     // -> companyMenu ?
                     employeeMenu(fakeAuthorizeEmployee());
+                }
+                case GuestMenuAction.REGISTER_COMPANY -> {
+                    registrationCompany();
                 }
                 case GuestMenuAction.EXIT -> {
                     System.out.println("Bye!");
@@ -96,19 +101,36 @@ public class ConsoleDriver {
         } while (action != EmployeeMenuAction.LOG_OUT);
     }
 
-    public static void registration() {
-        System.out.println("\n----- Registration -----");
-        String fullname = askStringValue("Enter full name", false);
-        String tin = askStringValue("Enter TIN", false);
+    public static void registrationUser() {
+        CompanyDAO companyDAO = new CompanyDAO();
+
+        System.out.println("\n----- Employee registration -----");
+        try {
+            Company company = companyDAO.readByName((askStringValue("Enter company name", false)));
+
+            String fullName = askStringValue("Enter full name", false);
+            String tin = askStringValue("Enter TIN", false);
+            String jobPosition = askStringValue("Enter job", false);
+            String password = askStringValue("Enter password", false);
+
+            Employee employee = new Employee(tin, password, fullName, jobPosition, company);
+            EmployeeDAO dao = new EmployeeDAO();
+
+            dao.insert(employee);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Company not exists: " + e.getMessage());
+        }
+
+        System.out.println("Employee registered successful");
+    }
+
+    public static void registrationCompany() {
+        System.out.println("\n----- Company registration -----");
         Company company = new Company(askStringValue("Enter company name", false));
-        String jobPosition = askStringValue("Enter job", false);
-        String password = askStringValue("Enter password", false);
 
-        Employee employee = new Employee(tin, password, fullname, jobPosition, company);
-        EmployeeDAO employeeDAO = new EmployeeDAO();
-
-        employeeDAO.insert(employee);
-        System.out.println("You registered successful");
+        CompanyDAO dao = new CompanyDAO();
+        dao.insert(company);
+        System.out.println("\nCompany registered successful\n");
     }
 
     // console helpers
