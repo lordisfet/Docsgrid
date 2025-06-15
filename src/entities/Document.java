@@ -5,7 +5,7 @@ import entities.user.Employee;
 import exceptions.DocumentTemplateValidationException;
 import exceptions.DocumentValidationException;
 import exceptions.SignatoryValidationException;
-import exceptions.UserValidationError;
+import exceptions.UserValidationException;
 
 import java.util.*;
 
@@ -100,7 +100,7 @@ public class Document extends BaseEntity {
             System.out.println("Template is not validated. " + e.getMessage());
         } catch (DocumentValidationException e) {
             System.out.println("Document is not validated. " + e.getMessage());
-        } catch (UserValidationError e) {
+        } catch (UserValidationException e) {
             System.out.println("Employees are not validated. " + e.getMessage());
         } catch (SignatoryValidationException e) {
             System.out.println("Signatories are not validated. " + e.getMessage());

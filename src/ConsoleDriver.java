@@ -3,7 +3,7 @@ import dao.EmployeeDAO;
 import entities.Company;
 import entities.user.Employee;
 import exceptions.ConsoleDriverException;
-import exceptions.UserValidationError;
+import exceptions.UserValidationException;
 import menuAction.EmployeeMenuAction;
 import menuAction.GuestMenuAction;
 
@@ -22,7 +22,7 @@ public class ConsoleDriver {
         try {
             return new Employee("12345-174678-500", "1212", "Johny",
                     "Manager", new Company("SSU"));
-        } catch (UserValidationError e) {
+        } catch (UserValidationException e) {
             System.out.println("Validation error. Message: " + e.getMessage());
             return null;
         }

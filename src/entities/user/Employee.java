@@ -1,7 +1,7 @@
 package entities.user;
 
 import entities.Company;
-import exceptions.UserValidationError;
+import exceptions.UserValidationException;
 
 import java.util.Objects;
 
@@ -10,17 +10,17 @@ public class Employee extends BaseUser {
     private String jobPosition;
     private Company company;
 
-    public Employee(String TIN, String password, String fullName, String jobPosition, Company company) throws UserValidationError {
+    public Employee(String TIN, String password, String fullName, String jobPosition, Company company) throws UserValidationException {
         super(TIN, password);
 
         if (fullName == null || fullName.isBlank()) {
-            throw new UserValidationError("Full name cannot be null or blank");
+            throw new UserValidationException("Full name cannot be null or blank");
         }
         if (jobPosition == null || jobPosition.isBlank()) {
-            throw new UserValidationError("Job position cannot be null or blank");
+            throw new UserValidationException("Job position cannot be null or blank");
         }
         if (company == null) {
-            throw new IllegalArgumentException("Company position cannot be null or blank");
+            throw new UserValidationException("Company position cannot be null or blank");
         }
 
         this.fullName = fullName;
@@ -28,17 +28,17 @@ public class Employee extends BaseUser {
         this.company = company;
     }
 
-    public Employee(Integer id ,String TIN, String password, String fullName, String jobPosition, Company company) throws UserValidationError {
+    public Employee(Integer id ,String TIN, String password, String fullName, String jobPosition, Company company) throws UserValidationException {
         super(id, TIN, password);
 
         if (fullName == null || fullName.isBlank()) {
-            throw new UserValidationError("Full name cannot be null or blank");
+            throw new UserValidationException("Full name cannot be null or blank");
         }
         if (jobPosition == null || jobPosition.isBlank()) {
-            throw new UserValidationError("Job position cannot be null or blank");
+            throw new UserValidationException("Job position cannot be null or blank");
         }
         if (company == null) {
-            throw new IllegalArgumentException("Company position cannot be null or blank");
+            throw new UserValidationException("Company position cannot be null or blank");
         }
 
         this.fullName = fullName;
@@ -57,9 +57,9 @@ public class Employee extends BaseUser {
         return fullName;
     }
 
-    public void setFullName(String fullName) throws UserValidationError {
+    public void setFullName(String fullName) throws UserValidationException {
         if (fullName == null || fullName.isBlank()) {
-            throw new UserValidationError("Full name cannot be null or blank");
+            throw new UserValidationException("Full name cannot be null or blank");
         }
 
         this.fullName = fullName;
@@ -69,9 +69,9 @@ public class Employee extends BaseUser {
         return jobPosition;
     }
 
-    public void setJobPosition(String jobPosition) throws UserValidationError {
+    public void setJobPosition(String jobPosition) throws UserValidationException {
         if (jobPosition == null || jobPosition.isBlank()) {
-            throw new UserValidationError("Full name cannot be null or blank");
+            throw new UserValidationException("Full name cannot be null or blank");
         }
 
         this.jobPosition = jobPosition;
