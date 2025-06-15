@@ -19,14 +19,6 @@ public class Company extends BaseEntity {
         this.companyName = companyName;
     }
 
-    public Company(Company other) {
-        if (other == null) {
-            throw new IllegalArgumentException("Company cannot be null");
-        }
-
-        this.companyName = other.companyName;
-    }
-
     public Company(Integer id, String companyName) {
         if (id == null || id < 1) {
             throw new IllegalIdException();
@@ -35,7 +27,16 @@ public class Company extends BaseEntity {
             throw new IllegalArgumentException("Company name cannot be null or blank");
         }
 
+        this.id = id;
+        this.companyName = companyName;
+    }
 
+    public Company(Company other) {
+        if (other == null) {
+            throw new IllegalArgumentException("Company cannot be null");
+        }
+
+        this.companyName = other.companyName;
     }
 
     public String getCompanyName() {

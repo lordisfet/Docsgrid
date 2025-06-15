@@ -12,8 +12,8 @@ import java.sql.SQLException;
 public class CompanyDAO implements GenericDAO<Company> {
     @Override
     public void insert(Company entity) {
-        if (entity.getCompanyName() == null || entity.getCompanyName().isBlank()) {
-            throw new IllegalArgumentException("Company name is required.");
+        if (entity == null) {
+            throw new IllegalArgumentException("Company name is required");
         }
 
         String sql = "INSERT INTO companies(company_name) VALUES (?) RETURNING id";
@@ -55,11 +55,37 @@ public class CompanyDAO implements GenericDAO<Company> {
 
     @Override
     public void update(Company entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("Company name is required");
+        }
+
+        String sql = "UPDATE companies SET company_name = ? WHERE id = ?";
+        try(Connection conn = DBConnection.connect();
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, entity.getCompanyName());
+            stmt.setInt(2, entity.getId());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
     @Override
     public void delete(Company entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("Company name is required");
+        }
 
+        String sql = "DELETE FROM companies WHERE id = ?";
+        try(Connection conn = DBConnection.connect();
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, entity.getId());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -16,22 +16,7 @@ public class EmployeeDAO implements GenericDAO<Employee> {
     @Override
     public void insert(Employee entity) {
         if (entity == null) {
-            throw new IllegalArgumentException("Employee entity cannot be null.");
-        }
-        if (entity.getTIN() == null || entity.getTIN().isBlank()) {
-            throw new IllegalArgumentException("TIN is required.");
-        }
-        if (entity.getFullName() == null || entity.getFullName().isBlank()) {
-            throw new IllegalArgumentException("Full name is required.");
-        }
-        if (entity.getPasswordHash() == null || entity.getPasswordHash().isBlank()) {
-            throw new IllegalArgumentException("Password hash is required.");
-        }
-        if (entity.getJobPosition() == null || entity.getJobPosition().isBlank()) {
-            throw new IllegalArgumentException("Job position is required.");
-        }
-        if (entity.getCompany() == null || entity.getCompany().getId() == null) {
-            throw new IllegalArgumentException("Company with valid ID is required.");
+            throw new IllegalArgumentException("Employee entity cannot be null");
         }
 
         String sql = "INSERT INTO employees(tin, full_name, password_hash, job, company_id) " +
@@ -84,11 +69,42 @@ public class EmployeeDAO implements GenericDAO<Employee> {
 
     @Override
     public void update(Employee entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("Employee entity cannot be null");
+        }
 
+        String sql = "UPDATE employees SET tin = ?, full_name = ?, password_hash = ?, job = ?, company_id = ? WHERE id = ?";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, entity.getTIN());
+            stmt.setString(2, entity.getFullName());
+            stmt.setString(3, entity.getPasswordHash());
+            stmt.setString(4, entity.getJobPosition());
+            stmt.setInt(5, entity.getCompany().getId());
+            stmt.setInt(6, entity.getId());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void delete(Employee entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("Employee entity cannot be null");
+        }
 
+        String sql = "DELETE FROM employees WHERE id = ?";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, entity.getId());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
