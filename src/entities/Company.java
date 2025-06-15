@@ -32,11 +32,8 @@ public class Company extends BaseEntity {
     }
 
     public Company(Company other) {
-        if (other == null) {
-            throw new IllegalArgumentException("Company cannot be null");
-        }
-
-        this.companyName = other.companyName;
+        super(other);
+        this.companyName = other.companyName;i
     }
 
     public String getCompanyName() {

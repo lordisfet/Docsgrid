@@ -39,6 +39,12 @@ public abstract class BaseUser extends BaseEntity {
         this.passwordHash = PasswordUtils.hashPassword(password);
     }
 
+    public BaseUser(BaseUser other) {
+        super(other);
+        this.TIN = other.TIN;
+        this.passwordHash = other.passwordHash;
+    }
+
     // We don`t need copy-constructor? I guess no, because user with same all fields cannot exist
 
     public String getTIN() {

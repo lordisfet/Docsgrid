@@ -46,6 +46,13 @@ public class Employee extends BaseUser {
         this.company = company;
     }
 
+    public Employee(Employee other) {
+        super(other);
+        this.fullName = other.fullName;
+        this.jobPosition = other.jobPosition;
+        this.company = other.company;
+    }
+
     public String getFullName() {
         return fullName;
     }
