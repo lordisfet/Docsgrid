@@ -1,6 +1,7 @@
 package dao;
 
 import database.DBConnection;
+import entities.Company;
 import entities.abstracts.BaseEntity;
 import entities.user.BaseUser;
 import entities.user.Employee;
@@ -47,7 +48,6 @@ public class EmployeeDAO implements GenericDAO<Employee> {
             if (rs.next()) {
                 entity.setId(rs.getInt("id"));
             }
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -58,28 +58,28 @@ public class EmployeeDAO implements GenericDAO<Employee> {
         if (id == null || id < 1) {
             throw new IllegalIdException();
         }
+
         String sql = "SELECT id, tin, fullname, password_hash, job, company_id FROM employees WHERE id = ?";
         try (Connection conn = DBConnection.connect();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
 
             ResultSet rs = stmt.executeQuery();
-
+            CompanyDAO companyDAO = new CompanyDAO();
             if (rs.next()) {
-//                return new Employee(
-//                        rs.getInt("id"),
-//                        rs.getString("tin"),
-//                        rs.getString("full_name"),
-//                        rs.getString("password_hash"),
-//                        rs.getString("job"),
-//                        new Company(rs.getInt("company_id"))
+
             }
-//            Employee emp = new Employee(stmt.getInt("int"))
+            return new Employee(
+                    rs.getInt("id"),
+                    rs.getString("tin"),
+                    rs.getString("full_name"),
+                    rs.getString("password_hash"),
+                    rs.getString("job"),
+                    new Company(companyDAO.readById(rs.getInt("id"))));
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return null;
     }
 
     @Override

@@ -23,6 +23,8 @@ public abstract class BaseUser extends BaseEntity {
     }
 
     public BaseUser(Integer id, String TIN, String password) throws UserValidationError {
+        super(id);
+
         if (id == null || id < 0) {
             throw new UserValidationError("id cannot be null or blank");
         }
@@ -77,16 +79,6 @@ public abstract class BaseUser extends BaseEntity {
     // public abstract List<Documents> getUnsignedDocuments(repository) { repository.getDocuments(where user is pending) }
     // public abstract Document declineDocument(repository, document)? {  repository.handleDecline()? }
 
-
-    @Override
-    public String toString() {
-        return "BaseUser{" +
-                "id=" + id +
-                ", TIN='" + TIN + '\'' +
-                ", passwordHash='" + passwordHash + '\'' +
-                '}';
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -97,5 +89,13 @@ public abstract class BaseUser extends BaseEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, TIN, passwordHash);
+    }
+
+    @Override
+    public String toString() {
+        return "BaseUser{" +
+                "TIN='" + TIN + '\'' +
+                ", passwordHash='" + passwordHash + '\'' +
+                '}';
     }
 }

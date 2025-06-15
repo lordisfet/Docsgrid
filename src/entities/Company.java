@@ -1,18 +1,41 @@
 package entities;
 
 import entities.abstracts.BaseEntity;
+import exceptions.IllegalIdException;
 
+import java.security.cert.CertificateParsingException;
 import java.util.Objects;
 
 public class Company extends BaseEntity {
     private String companyName;
 
     public Company(String companyName) {
+        super();
+
         if (companyName == null || companyName.isBlank()){
             throw new IllegalArgumentException("Company name cannot be null or blank");
         }
 
         this.companyName = companyName;
+    }
+
+    public Company(Company other) {
+        if (other == null) {
+            throw new IllegalArgumentException("Company cannot be null");
+        }
+
+        this.companyName = other.companyName;
+    }
+
+    public Company(Integer id, String companyName) {
+        if (id == null || id < 1) {
+            throw new IllegalIdException();
+        }
+        if (companyName == null || companyName.isBlank()){
+            throw new IllegalArgumentException("Company name cannot be null or blank");
+        }
+
+
     }
 
     public String getCompanyName() {

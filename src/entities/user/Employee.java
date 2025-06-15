@@ -3,9 +3,10 @@ package entities.user;
 import entities.Company;
 import exceptions.UserValidationError;
 
+import java.util.Objects;
+
 public class Employee extends BaseUser {
     private String fullName;
-    // TODO: private Company company;
     private String jobPosition;
     private Company company;
 
@@ -77,7 +78,18 @@ public class Employee extends BaseUser {
         this.company = company;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Employee employee = (Employee) o;
+        return Objects.equals(fullName, employee.fullName) && Objects.equals(jobPosition, employee.jobPosition) && Objects.equals(company, employee.company);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), fullName, jobPosition, company);
+    }
 
     @Override
     public String toString() {
