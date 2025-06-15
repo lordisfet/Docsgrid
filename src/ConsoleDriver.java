@@ -1,4 +1,5 @@
-import entities.User.Employee;
+import entities.Company;
+import entities.user.Employee;
 import exceptions.ConsoleDriverException;
 import exceptions.UserValidationError;
 import menuAction.EmployeeMenuAction;
@@ -17,7 +18,8 @@ public class ConsoleDriver {
 
     private static Employee fakeAuthorizeEmployee() {
         try {
-            return new Employee("12345-174678-500", "1212", "Johny", "Manager");
+            return new Employee("12345-174678-500", "1212", "Johny",
+                    "Manager", new Company("SSU"));
         } catch (UserValidationError e) {
             System.out.println("Validation error. Message: " + e.getMessage());
             return null;

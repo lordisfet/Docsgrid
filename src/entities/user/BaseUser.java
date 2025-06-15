@@ -1,6 +1,6 @@
-package entities.User;
+package entities.user;
 
-import entities.Abstaract.BaseEntity;
+import entities.abstracts.BaseEntity;
 import exceptions.UserValidationError;
 import org.mindrot.jbcrypt.BCrypt;
 import java.util.Objects;
@@ -23,6 +23,8 @@ public abstract class BaseUser extends BaseEntity {
     }
 
     public BaseUser(Integer id, String TIN, String password) throws UserValidationError {
+        super(id);
+
         if (id == null || id < 0) {
             throw new UserValidationError("id cannot be null or blank");
         }
@@ -35,6 +37,12 @@ public abstract class BaseUser extends BaseEntity {
 
         this.TIN = TIN;
         this.passwordHash = PasswordUtils.hashPassword(password);
+    }
+
+    public BaseUser(BaseUser other) {
+        super(other);
+        this.TIN = other.TIN;
+        this.passwordHash = other.passwordHash;
     }
 
     // We don`t need copy-constructor? I guess no, because user with same all fields cannot exist
@@ -77,16 +85,6 @@ public abstract class BaseUser extends BaseEntity {
     // public abstract List<Documents> getUnsignedDocuments(repository) { repository.getDocuments(where user is pending) }
     // public abstract Document declineDocument(repository, document)? {  repository.handleDecline()? }
 
-
-    @Override
-    public String toString() {
-        return "BaseUser{" +
-                "id=" + id +
-                ", TIN='" + TIN + '\'' +
-                ", passwordHash='" + passwordHash + '\'' +
-                '}';
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -97,5 +95,13 @@ public abstract class BaseUser extends BaseEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, TIN, passwordHash);
+    }
+
+    @Override
+    public String toString() {
+        return "BaseUser{" +
+                "TIN='" + TIN + '\'' +
+                ", passwordHash='" + passwordHash + '\'' +
+                '}';
     }
 }

@@ -2,7 +2,7 @@ package exceptions;
 
 import java.security.PrivilegedActionException;
 
-public class UserValidationError extends Exception {
+public class UserValidationError extends IllegalArgumentException {
     public UserValidationError(String message) {
         super(message);
     }
