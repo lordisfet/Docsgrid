@@ -9,6 +9,7 @@ public abstract class BaseUser extends BaseEntity {
     private String TIN;
     private String passwordHash;
 
+    // Add TIN format checking
 
     public BaseUser(String TIN, String password) throws UserValidationError {
         if (TIN == null || TIN.isBlank()) {

@@ -1,3 +1,4 @@
+import dao.EmployeeDAO;
 import entities.Company;
 import entities.user.Employee;
 import exceptions.ConsoleDriverException;
@@ -43,7 +44,7 @@ public class ConsoleDriver {
             action = GuestMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
                 case GuestMenuAction.REGISTER -> {
-                    // todo register
+                    registration();
                 }
                 case GuestMenuAction.LOGIN -> {
                     // todo login
@@ -95,10 +96,25 @@ public class ConsoleDriver {
         } while (action != EmployeeMenuAction.LOG_OUT);
     }
 
+    public static void registration() {
+        System.out.println("\n----- Registration -----");
+        String fullname = askStringValue("Enter full name", false);
+        String tin = askStringValue("Enter TIN", false);
+        Company company = new Company(askStringValue("Enter company name", false));
+        String jobPosition = askStringValue("Enter job", false);
+        String password = askStringValue("Enter password", false);
+
+        Employee employee = new Employee(tin, password, fullname, jobPosition, company);
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+
+        employeeDAO.insert(employee);
+        System.out.println("You registered successful");
+    }
+
     // console helpers
 
     private static String askStringValue(String question, boolean canBeBlank) {
-        String answer = "";
+        String answer;
 
         do {
             System.out.print(question + ": ");
