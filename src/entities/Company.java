@@ -33,7 +33,7 @@ public class Company extends BaseEntity {
 
     public Company(Company other) {
         super(other);
-        this.companyName = other.companyName;i
+        this.companyName = other.companyName;
     }
 
     public String getCompanyName() {
