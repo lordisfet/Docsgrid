@@ -2,6 +2,7 @@ import dao.CompanyDAO;
 import dao.EmployeeDAO;
 import entities.Company;
 import entities.user.Employee;
+import exceptions.CompanyValidationException;
 import exceptions.ConsoleDriverException;
 import exceptions.UserValidationException;
 import menuAction.EmployeeMenuAction;
@@ -71,10 +72,9 @@ public class ConsoleDriver {
 
         System.out.println("\nID: " + emp.getId());
         System.out.println("Name: " + emp.getFullName());
-        // TODO: System.out.println("Company: " + emp.getCompany().getName());
         System.out.println("Job position: " + emp.getJobPosition());
         System.out.println("TIN: " + emp.getTIN());
-        System.out.println("company: " + emp.getCompany().getCompanyName());
+        System.out.println("Company: " + emp.getCompany().getCompanyName());
 
         System.out.println("\n----- Menu -----");
         System.out.println("1) Create new document");
@@ -102,14 +102,22 @@ public class ConsoleDriver {
     }
 
     public static void registrationUser() {
-        CompanyDAO companyDAO = new CompanyDAO();
+        Company company;
 
-        System.out.println("\n----- Employee registration -----");
+        System.out.println("\n----- Employee sign up -----");
+
         try {
-            Company company = companyDAO.readByName((askStringValue("Enter company name", false)));
+            CompanyDAO companyDAO = new CompanyDAO();
+            String companyName = askStringValue("Enter company name", false);
 
-            String fullName = askStringValue("Enter full name", false);
+            while (!companyDAO.existsByName(companyName)) {
+                System.out.println("Company with name: " + companyName + " not exists. Pls try again or add company if you are owner");
+                companyName = askStringValue("Enter company name", false);
+            }
+            company = companyDAO.readByName(companyName);
+
             String tin = askStringValue("Enter TIN", false);
+            String fullName = askStringValue("Enter full name", false);
             String jobPosition = askStringValue("Enter job", false);
             String password = askStringValue("Enter password", false);
 
@@ -117,7 +125,7 @@ public class ConsoleDriver {
             EmployeeDAO dao = new EmployeeDAO();
 
             dao.insert(employee);
-        } catch (IllegalArgumentException e) {
+        } catch (CompanyValidationException e) {
             System.out.println("Company not exists: " + e.getMessage());
         }
 
@@ -131,6 +139,13 @@ public class ConsoleDriver {
         CompanyDAO dao = new CompanyDAO();
         dao.insert(company);
         System.out.println("\nCompany registered successful\n");
+    }
+
+    public static Employee loginUser() {
+        System.out.println("\n----- Employee login -----");
+        Employee employee;
+
+        return null
     }
 
     // console helpers

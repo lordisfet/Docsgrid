@@ -107,4 +107,8 @@ public class EmployeeDAO implements GenericDAO<Employee> {
             throw new RuntimeException(e);
         }
     }
+
+    public boolean existsByTINandPasswordHash() {
+
+    }
 }
