@@ -1,7 +1,7 @@
 package entities.user;
 
 import entities.abstracts.BaseEntity;
-import exceptions.UserValidationError;
+import exceptions.UserValidationException;
 import org.mindrot.jbcrypt.BCrypt;
 import java.util.Objects;
 
@@ -9,30 +9,31 @@ public abstract class BaseUser extends BaseEntity {
     private String TIN;
     private String passwordHash;
 
+    // Add TIN format checking
 
-    public BaseUser(String TIN, String password) throws UserValidationError {
+    public BaseUser(String TIN, String password) throws UserValidationException {
         if (TIN == null || TIN.isBlank()) {
-            throw new UserValidationError("TIN cannot be null or blank");
+            throw new UserValidationException("TIN cannot be null or blank");
         }
         if (password == null || password.isBlank()) {
-            throw new UserValidationError("passwordHash cannot be null or blank");
+            throw new UserValidationException("passwordHash cannot be null or blank");
         }
 
         this.TIN = TIN;
         this.passwordHash = PasswordUtils.hashPassword(password);
     }
 
-    public BaseUser(Integer id, String TIN, String password) throws UserValidationError {
+    public BaseUser(Integer id, String TIN, String password) throws UserValidationException {
         super(id);
 
         if (id == null || id < 0) {
-            throw new UserValidationError("id cannot be null or blank");
+            throw new UserValidationException("id cannot be null or blank");
         }
         if (TIN == null || TIN.isBlank()) {
-            throw new UserValidationError("TIN cannot be null or blank");
+            throw new UserValidationException("TIN cannot be null or blank");
         }
         if (password == null || password.isBlank()) {
-            throw new UserValidationError("passwordHash cannot be null or blank");
+            throw new UserValidationException("passwordHash cannot be null or blank");
         }
 
         this.TIN = TIN;
@@ -51,9 +52,9 @@ public abstract class BaseUser extends BaseEntity {
         return TIN;
     }
 
-    public void setTIN(String TIN) throws UserValidationError {
+    public void setTIN(String TIN) throws UserValidationException {
         if (TIN == null || TIN.isBlank()) {
-            throw new UserValidationError("TIN cannot be null or blank");
+            throw new UserValidationException("TIN cannot be null or blank");
         }
 
         this.TIN = TIN;

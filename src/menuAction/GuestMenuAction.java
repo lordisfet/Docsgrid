@@ -1,7 +1,8 @@
 package menuAction;
 
 public enum GuestMenuAction {
-    REGISTER,
+    SIGN_UP,
     LOGIN,
+    REGISTER_COMPANY,
     EXIT
 }

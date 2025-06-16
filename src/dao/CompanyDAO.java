@@ -53,6 +53,27 @@ public class CompanyDAO implements GenericDAO<Company> {
         return null;
     }
 
+    public Company readByName(String companyName) {
+        if (companyName == null || companyName.isBlank()) {
+            throw new IllegalArgumentException("Company name cannot be null or blank");
+        }
+
+        String sql = "SELECT id, company_name FROM companies WHERE company_name = ?";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, companyName);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Company(rs.getInt("id"), rs.getString("company_name"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return null;
+    }
+
     @Override
     public void update(Company entity) {
         if (entity == null) {
@@ -60,8 +81,8 @@ public class CompanyDAO implements GenericDAO<Company> {
         }
 
         String sql = "UPDATE companies SET company_name = ? WHERE id = ?";
-        try(Connection conn = DBConnection.connect();
-        PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, entity.getCompanyName());
             stmt.setInt(2, entity.getId());
 
@@ -79,13 +100,34 @@ public class CompanyDAO implements GenericDAO<Company> {
         }
 
         String sql = "DELETE FROM companies WHERE id = ?";
-        try(Connection conn = DBConnection.connect();
-        PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, entity.getId());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean existsByName(String companyName) {
+        if (companyName == null || companyName.isBlank()) {
+            throw new IllegalArgumentException("Company name cannot be null for exists statement");
+        }
+
+        String sql = "SELECT EXISTS (SELECT 1 FROM companies WHERE company_name = ?)";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, companyName);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getBoolean(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return false;
     }
 }

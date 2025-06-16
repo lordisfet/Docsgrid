@@ -107,4 +107,53 @@ public class EmployeeDAO implements GenericDAO<Employee> {
             throw new RuntimeException(e);
         }
     }
+
+    public boolean existsByTIN(String tin) {
+        if (tin == null || tin.isBlank()) {
+            throw new IllegalArgumentException("TIN cannot be null or empty for exists statement");
+        }
+
+        String sql = "SELECT EXISTS(SELECT 1 FROM employees WHERE tin = ?)";
+        try(Connection conn = DBConnection.connect();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, tin);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getBoolean(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return false;
+    }
+
+    public Employee readByTINandPasswordHash(String tin, String password) {
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("password cannot be null or empty for exists statement");
+        }
+
+        String sql = "SELECT id, tin, full_name, password_hash, job, company_id FROM employees WHERE tin = ?";
+        try(Connection conn = DBConnection.connect();
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, tin);
+
+            ResultSet rs = stmt.executeQuery();
+            CompanyDAO companyDAO = new CompanyDAO();
+            if (rs.next()) {
+                return new Employee(
+                        rs.getInt("id"),
+                        rs.getString("tin"),
+                        rs.getString("password_hash"),
+                        rs.getString("full_name"),
+                        rs.getString("job"),
+                        new Company(companyDAO.readById(rs.getInt("company_id"))));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return null;
+    }
 }
