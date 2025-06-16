@@ -1,6 +1,7 @@
 import dao.CompanyDAO;
 import dao.EmployeeDAO;
 import entities.Company;
+import entities.DocumentTemplate;
 import entities.user.Employee;
 import exceptions.CompanyValidationException;
 import exceptions.ConsoleDriverException;
@@ -8,6 +9,8 @@ import exceptions.UserValidationException;
 import menuAction.EmployeeMenuAction;
 import menuAction.GuestMenuAction;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleDriver {
@@ -181,6 +184,12 @@ public class ConsoleDriver {
         employee = employeeDAO.readByTINandPasswordHash(tin, password);
 
         return employee;
+    }
+
+    private static List<DocumentTemplate> showAllDocumentTemplates() {
+        ArrayList<DocumentTemplate> templates = null;
+
+        return templates;
     }
 
     // console helpers
