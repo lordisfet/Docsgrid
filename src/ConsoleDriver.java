@@ -130,7 +130,7 @@ public class ConsoleDriver {
             String tin;
 
             do {
-                tin = askStringValue("Enter TIN", true);
+                tin = askTINValue();
                 if (tin.isBlank()) {
                     System.out.println("\nReturning...");
                     return;
@@ -176,7 +176,7 @@ public class ConsoleDriver {
 
         System.out.println("\n----- Employee login -----");
 
-        String tin = askStringValue("Enter TIN", false);
+        String tin = askTINValue();
         String password = askStringValue("Enter password", false);
         employee = employeeDAO.readByTINandPasswordHash(tin, password);
 
@@ -184,6 +184,21 @@ public class ConsoleDriver {
     }
 
     // console helpers
+
+    private static String askTINValue() {
+        String answer;
+        final String TIN_FORMAT = "\\d{3}-\\d{2}-\\d{4}";
+
+        System.out.println("TIN format is NNN-NN-NNNN. N is number from 0 to 9.");
+        answer = askStringValue("Enter TIN", false);
+
+        while (!answer.matches(TIN_FORMAT)) {
+            System.out.println("You entered a TIN which does not follow the format NNN-NN-NNNN. Try again");
+            answer = askStringValue("Enter TIN", false);
+        }
+
+        return answer;
+    }
 
     private static String askStringValue(String question, boolean canBeBlank) {
         String answer;
