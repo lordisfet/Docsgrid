@@ -50,14 +50,13 @@ public class ConsoleDriver {
                     registrationUser();
                 }
                 case GuestMenuAction.LOGIN -> {
-                    // Add check for passwordHash
                     Employee employee = loginUser();
                     try {
                         employeeMenu(employee);
+                        System.out.println("\nLogin was successful");
                     } catch (ConsoleDriverException e) {
                         System.out.println("\nLogin with this TIN or/and password not exists");
                     }
-
                 }
                 case GuestMenuAction.REGISTER_COMPANY -> {
                     registrationCompany();
@@ -74,7 +73,7 @@ public class ConsoleDriver {
             throw new ConsoleDriverException("Employee is null");
         }
 
-        System.out.println("Name: " + emp.getFullName());
+        System.out.println("\nName: " + emp.getFullName());
         System.out.println("Job position: " + emp.getJobPosition());
         System.out.println("TIN: " + emp.getTIN());
         System.out.println("Company: " + emp.getCompany().getCompanyName());
@@ -138,7 +137,7 @@ public class ConsoleDriver {
                 }
                 if (employeeDAO.existsByTIN(tin)) {
                     System.out.println("Employee with this TIN:" + tin + " exists. Try else or login");
-;                }
+                }
             } while (employeeDAO.existsByTIN(tin));
 
             String fullName = askStringValue("Enter full name", false);
@@ -151,7 +150,7 @@ public class ConsoleDriver {
             dao.insert(employee);
         } catch (CompanyValidationException e) {
             System.out.println("Company not exists: " + e.getMessage());
-        } catch (UserValidationException e ) {
+        } catch (UserValidationException e) {
             System.out.println("Employee exists: " + e.getMessage());
         }
 
@@ -166,27 +165,20 @@ public class ConsoleDriver {
         if (!dao.existsByName(company.getCompanyName())) {
             dao.insert(company);
             System.out.println("\nCompany registered successful\n");
-        }
-        else {
+        } else {
             System.out.println("\nCompany with name " + company.getCompanyName() + " already exists\n");
         }
     }
 
     public static Employee loginUser() {
-        Employee employee = null;
+        Employee employee;
         EmployeeDAO employeeDAO = new EmployeeDAO();
 
         System.out.println("\n----- Employee login -----");
 
-        try {
-            String tin = askStringValue("Enter TIN", false);
-            String password = askStringValue("Enter password", false);
-
-            employee = employeeDAO.readByTINandPasswordHash(tin, password);
-
-        } catch (UserValidationException e) {
-            System.out.println("Employee not exists: " + e.getMessage());
-        }
+        String tin = askStringValue("Enter TIN", false);
+        String password = askStringValue("Enter password", false);
+        employee = employeeDAO.readByTINandPasswordHash(tin, password);
 
         return employee;
     }
