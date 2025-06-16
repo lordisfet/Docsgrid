@@ -42,6 +42,18 @@ public class Document extends BaseEntity {
         this.content = new HashMap<>(data);
     }
 
+    public DocumentTemplate getTemplate() {
+        return template;
+    }
+
+    public Map<String, String> getContent() {
+        return content;
+    }
+
+    public List<Signatory> getSignatories() {
+        return signatories;
+    }
+
     public boolean isCompleted() {
         for (Signatory signatory : this.signatories) {
             if (!signatory.isSigned()) return false;
