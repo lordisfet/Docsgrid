@@ -112,7 +112,7 @@ public class CompanyDAO implements GenericDAO<Company> {
 
     public boolean existsByName(String companyName) {
         if (companyName == null || companyName.isBlank()) {
-            throw new IllegalArgumentException("Company name cannot be null for exists statement.");
+            throw new IllegalArgumentException("Company name cannot be null for exists statement");
         }
 
         String sql = "SELECT EXISTS (SELECT 1 FROM companies WHERE company_name = ?)";
