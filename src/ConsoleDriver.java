@@ -50,6 +50,7 @@ public class ConsoleDriver {
                     registrationUser();
                 }
                 case GuestMenuAction.LOGIN -> {
+                    // Add check for passwordHash
                     Employee employee = loginUser();
                     try {
                         employeeMenu(employee);
@@ -127,11 +128,19 @@ public class ConsoleDriver {
 
             company = companyDAO.readByName(companyName);
 
-            String tin = askStringValue("Enter TIN", false);
-            if (employeeDAO.existsByTIN(tin)) {
-                System.out.println("\nEmployee with this TIN exists. Try else or login\n");
-                return;
-            }
+            String tin;
+
+            do {
+                tin = askStringValue("Enter TIN", true);
+                if (tin.isBlank()) {
+                    System.out.println("\nReturning...");
+                    return;
+                }
+                if (employeeDAO.existsByTIN(tin)) {
+                    System.out.println("Employee with this TIN:" + tin + " exists. Try else or login");
+;                }
+            } while (employeeDAO.existsByTIN(tin));
+
             String fullName = askStringValue("Enter full name", false);
             String jobPosition = askStringValue("Enter job", false);
             String password = askStringValue("Enter password", false);
@@ -142,6 +151,8 @@ public class ConsoleDriver {
             dao.insert(employee);
         } catch (CompanyValidationException e) {
             System.out.println("Company not exists: " + e.getMessage());
+        } catch (UserValidationException e ) {
+            System.out.println("Employee exists: " + e.getMessage());
         }
 
         System.out.println("Employee registered successful");
