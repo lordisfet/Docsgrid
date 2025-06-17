@@ -2,17 +2,18 @@ import dao.CompanyDAO;
 import dao.DocumentTemplateDAO;
 import dao.EmployeeDAO;
 import entities.Company;
+import entities.Document;
 import entities.DocumentTemplate;
 import entities.user.Employee;
 import exceptions.CompanyValidationException;
 import exceptions.ConsoleDriverException;
 import exceptions.UserValidationException;
+import menuAction.DocumentCreationMenuAction;
 import menuAction.EmployeeMenuAction;
 import menuAction.GuestMenuAction;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import javax.print.Doc;
+import java.util.*;
 
 public class ConsoleDriver {
     private static final Scanner scanner = new Scanner(System.in);
@@ -97,7 +98,7 @@ public class ConsoleDriver {
                 case EmployeeMenuAction.CREATE_DOC -> {
                     // ? -> select template -> filling data -> choose signatories -> this menu
                     System.out.println("\n----- Create new document -----");
-                    showAllDocumentTemplates();
+                    createDocument();
                 }
                 case EmployeeMenuAction.LIST_DOCS -> System.out.println("List my signed documents");
                 case EmployeeMenuAction.SHOW_UNSIGNED_DOCS -> System.out.println("Show unsigned documents");
@@ -198,13 +199,56 @@ public class ConsoleDriver {
 
         System.out.println("List of all templates:");
         for (int i = 0; i < templates.size(); i++) {
-            System.out.println("\t" + (i + 1) + ") " + templates.get(i).getTitle());
+            System.out.println("\t" + templates.get(i).getId() + ") " + templates.get(i).getTitle());
         }
     }
 
-    private static DocumentTemplate createDocument() {
-        DocumentTemplateDAO dao = new DocumentTemplateDAO();
-        Integer id = askIntegerValue("Choose document`s template by id");
+    private static Document createDocument() {
+        DocumentTemplateDAO documentTemplateDAO = new DocumentTemplateDAO();
+        DocumentTemplate documentTemplate;
+
+        int id;
+        int actionLenght = DocumentCreationMenuAction.values().length;
+        DocumentCreationMenuAction action;
+
+        do {
+            showAllDocumentTemplates();
+
+            id = askIntegerValue("\nChoose document`s template by id");
+            documentTemplate = documentTemplateDAO.readById(id);
+            System.out.println('\n' + documentTemplate.showStructure());
+
+            System.out.println("""
+                    ----- Document actions -----
+                    1) Select this template
+                    2) Select other template
+                    3) Exit from creation document
+                    """);
+            action = DocumentCreationMenuAction.values()[askIntegerValue("Document action", 1, actionLenght) - 1];
+
+            switch (action) {
+                case SELECT_THIS_TEMPLATE -> {
+                    Set<String> keys = documentTemplateDAO.readById(id).getKeys();
+                    Map<String, String> values = new HashMap<>();
+
+                    System.out.println("----- Filling out a document -----");
+                    for (String key : keys) {
+                        values.put(key, askStringValue("Enter " + key, false));
+                    }
+
+                }
+                case CHANGE_TEMPLATE -> {
+
+                }
+                case LEAVE -> {
+                    System.out.println("Leaving from document creation...");
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + action);
+            }
+
+        } while (action != DocumentCreationMenuAction.LEAVE);
+
+
         // TODO: Add logic for creation document
         return null;
     }
