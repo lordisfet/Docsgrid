@@ -39,10 +39,7 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
     }
 
     public DocumentTemplate(DocumentTemplate other) {
-        if (other == null) {
-            throw new DocumentTemplateValidationException("Document`s template for copy cannot be null");
-        }
-
+        super(other);
         this.title = other.title;
         this.structure = other.structure;
         this.keys = new HashSet<>(other.keys);
