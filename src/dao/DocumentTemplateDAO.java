@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DocumentTemplateDAO implements GenericDAO<DocumentTemplate> {
 
@@ -98,5 +100,24 @@ public class DocumentTemplateDAO implements GenericDAO<DocumentTemplate> {
         } catch (SQLException e) {
             throw new RuntimeException("Error deleting DocumentTemplate", e);
         }
+    }
+
+    public List<DocumentTemplate> readAll() {
+        ArrayList<DocumentTemplate> templates = new ArrayList<>();
+
+        String sql = "SELECT id, title FROM document_templates";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                DocumentTemplate template = new DocumentTemplate(rs.getInt("id"),
+                        rs.getString("title"), null);
+                templates.add(template);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return templates;
     }
 }
