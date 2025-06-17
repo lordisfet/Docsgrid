@@ -17,13 +17,13 @@ public abstract class BaseEntity {
         this.id = id;
     }
 
-    public BaseEntity(BaseEntity other) {
+    /*public BaseEntity(BaseEntity other) {
         if (other == null) {
             throw new IllegalArgumentException("BaseEntity cannot be null");
         }
 
         this.id = other.id;
-    }
+    }*/
 
     public Integer getId() {
         return id;

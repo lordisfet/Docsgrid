@@ -41,7 +41,6 @@ public abstract class BaseUser extends BaseEntity {
     }
 
     public BaseUser(BaseUser other) {
-        super(other);
         this.TIN = other.TIN;
         this.passwordHash = other.passwordHash;
     }

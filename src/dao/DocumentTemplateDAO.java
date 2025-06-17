@@ -111,7 +111,7 @@ public class DocumentTemplateDAO implements GenericDAO<DocumentTemplate> {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 DocumentTemplate template = new DocumentTemplate(rs.getInt("id"),
-                        rs.getString("title"), null);
+                        rs.getString("title"));
                 templates.add(template);
             }
         } catch (SQLException e) {

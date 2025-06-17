@@ -61,14 +61,12 @@ public class ConsoleDriver {
                     } catch (ConsoleDriverException e) {
                         System.out.println("\nLogin with this TIN or/and password not exists");
                     }
-
-
                 }
                 case GuestMenuAction.REGISTER_COMPANY -> {
                     registrationCompany();
                 }
                 case GuestMenuAction.EXIT -> {
-                    System.out.println("Bye!");
+                    System.out.println("\nBye!");
                 }
             }
         } while (action != GuestMenuAction.EXIT);
@@ -84,21 +82,22 @@ public class ConsoleDriver {
         System.out.println("TIN: " + emp.getTIN());
         System.out.println("Company: " + emp.getCompany().getCompanyName());
 
-        System.out.println("\n----- Menu -----");
-        System.out.println("1) Create new document");
-        System.out.println("2) List signed documents");
-        System.out.println("3) Show unsigned documents");
-        System.out.println("4) Log out\n");
-
         int actionsLength = EmployeeMenuAction.values().length;
         EmployeeMenuAction action;
 
         do {
+            System.out.println("\n----- Menu -----");
+            System.out.println("1) Create new document");
+            System.out.println("2) List signed documents");
+            System.out.println("3) Show unsigned documents");
+            System.out.println("4) Log out\n");
+
             action = EmployeeMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
                 case EmployeeMenuAction.CREATE_DOC -> {
                     // ? -> select template -> filling data -> choose signatories -> this menu
-                    System.out.println("Create new document");
+                    System.out.println("\n----- Create new document -----");
+                    showAllDocumentTemplates();
                 }
                 case EmployeeMenuAction.LIST_DOCS -> System.out.println("List my signed documents");
                 case EmployeeMenuAction.SHOW_UNSIGNED_DOCS -> System.out.println("Show unsigned documents");
@@ -182,9 +181,13 @@ public class ConsoleDriver {
 
         System.out.println("\n----- Employee login -----");
 
-        String tin = askTINValue();
+        // NOTE: uncomment for real using
+        /*String tin = askTINValue();
         String password = askStringValue("Enter password", false);
-        employee = employeeDAO.readByTINandPasswordHash(tin, password);
+        employee = employeeDAO.readByTINandPasswordHash(tin, password);*/
+
+        // NOTE: test data
+        employee = employeeDAO.readByTINandPasswordHash("000-00-0000", "test");
 
         return employee;
     }
@@ -193,12 +196,19 @@ public class ConsoleDriver {
         DocumentTemplateDAO dao = new DocumentTemplateDAO();
         ArrayList<DocumentTemplate> templates = dao.readAll();
 
+        System.out.println("List of all templates:");
         for (int i = 0; i < templates.size(); i++) {
-            System.out.println('\t' + (i + 1) + ") " + templates.get(i).getTitle());
+            System.out.println("\t" + (i + 1) + ") " + templates.get(i).getTitle());
         }
-
-        System.out.println("#) Test title of document template");
     }
+
+    private static DocumentTemplate createDocument() {
+        DocumentTemplateDAO dao = new DocumentTemplateDAO();
+        Integer id = askIntegerValue("Choose document`s template by id");
+        // TODO: Add logic for creation document
+        return null;
+    }
+
 
     // console helpers
 
