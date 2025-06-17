@@ -2,7 +2,7 @@ package exceptions;
 
 import java.security.PrivilegedActionException;
 
-public class DocumentValidationException extends Exception {
+public class DocumentValidationException extends RuntimeException {
     public DocumentValidationException(String message) {
         super(message);
     }
