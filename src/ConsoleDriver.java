@@ -1,4 +1,5 @@
 import dao.CompanyDAO;
+import dao.DocumentTemplateDAO;
 import dao.EmployeeDAO;
 import entities.Company;
 import entities.DocumentTemplate;
@@ -60,6 +61,8 @@ public class ConsoleDriver {
                     } catch (ConsoleDriverException e) {
                         System.out.println("\nLogin with this TIN or/and password not exists");
                     }
+
+
                 }
                 case GuestMenuAction.REGISTER_COMPANY -> {
                     registrationCompany();
@@ -186,12 +189,15 @@ public class ConsoleDriver {
         return employee;
     }
 
-    private static List<DocumentTemplate> showAllDocumentTemplates() {
-        ArrayList<DocumentTemplate> templates = null;
+    private static void showAllDocumentTemplates() {
+        DocumentTemplateDAO dao = new DocumentTemplateDAO();
+        ArrayList<DocumentTemplate> templates = dao.readAll();
 
-         
+        for (int i = 0; i < templates.size(); i++) {
+            System.out.println('\t' + (i + 1) + ") " + templates.get(i).getTitle());
+        }
 
-        return templates;
+        System.out.println("#) Test title of document template");
     }
 
     // console helpers

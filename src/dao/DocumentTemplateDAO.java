@@ -102,7 +102,7 @@ public class DocumentTemplateDAO implements GenericDAO<DocumentTemplate> {
         }
     }
 
-    public List<DocumentTemplate> readAll() {
+    public ArrayList<DocumentTemplate> readAll() {
         ArrayList<DocumentTemplate> templates = new ArrayList<>();
 
         String sql = "SELECT id, title FROM document_templates";
