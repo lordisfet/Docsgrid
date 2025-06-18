@@ -116,10 +116,6 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
         }
     }
 
-    public String showStructure() {
-        return structure;
-    }
-
     @Override
     public String toString() {
         return "DocumentTemplate{" +

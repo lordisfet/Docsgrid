@@ -17,8 +17,10 @@ import menuAction.GuestMenuAction;
 import javax.print.Doc;
 import java.util.*;
 
+import static validators.ConsoleValidator.*;
+
+
 public class ConsoleDriver {
-    private static final Scanner scanner = new Scanner(System.in);
     // private static database ?
     // private static Repository repository ?
 
@@ -167,14 +169,15 @@ public class ConsoleDriver {
 
     public static void registrationCompany() {
         System.out.println("\n----- Company registration -----");
-        Company company = new Company(askStringValue("Enter company name", false));
+        String companyName = askStringValue("Enter company name", false);
+
         CompanyDAO dao = new CompanyDAO();
 
-        if (!dao.existsByName(company.getCompanyName())) {
-            dao.insert(company);
+        if (!dao.existsByName(companyName)) {
+            dao.insert(new Company(companyName));
             System.out.println("\nCompany registered successful\n");
         } else {
-            System.out.println("\nCompany with name " + company.getCompanyName() + " already exists\n");
+            System.out.println("\nCompany with name " + companyName + " already exists\n");
         }
     }
 
@@ -205,7 +208,7 @@ public class ConsoleDriver {
         }
     }
 
-    private static void createDocument(Employee employee) {
+    private static Document createDocument(Employee employee) {
         DocumentTemplateDAO documentTemplateDAO = new DocumentTemplateDAO();
         DocumentDAO documentDAO = new DocumentDAO();
         EmployeeDAO employeeDAO = new EmployeeDAO();
@@ -221,7 +224,7 @@ public class ConsoleDriver {
 
             id = askIntegerValue("\nChoose document`s template by id");
             documentTemplate = documentTemplateDAO.readById(id);
-            System.out.println('\n' + documentTemplate.showStructure());
+            System.out.println('\n' + documentTemplate.getStructure());
 
             System.out.println("""
                     ----- Document actions -----
@@ -233,13 +236,14 @@ public class ConsoleDriver {
 
             switch (action) {
                 case SELECT_THIS_TEMPLATE -> {
-                    System.out.println("Enter fields");
                     Set<String> keys = documentTemplateDAO.readById(id).getKeys();
+                    List<Signatory> signatories = new ArrayList<>();
+                    signatories.add(new Signatory(employee, true));
 
-                    System.out.println("----- Filling out a document -----");
+                    System.out.println("\n----- Filling out a document -----");
+                    Map<String, String> values = setValuesForDocument(keys);
 
-//                    documentDAO.insert(new Document(documentTemplate, values ));
-                    return;
+                    return new Document(documentTemplate, values, signatories);
                 }
                 case CHANGE_TEMPLATE -> {
 
@@ -252,73 +256,6 @@ public class ConsoleDriver {
 
         } while (action != DocumentCreationMenuAction.LEAVE);
 
-        // TODO: Add logic for creation document
-    }
-
-    private static Map<String, String> setValuesForDocument(Set<String> keys) {
-        Map<String, String> values = new HashMap<>();
-
-        for (String key : keys) {
-
-            values.put(key, askStringValue("Enter " + key, false));
-        }
-
-        return values;
-    }
-
-
-    // console helpers
-
-    private static String askTINValue() {
-        String answer;
-        final String TIN_FORMAT = "\\d{3}-\\d{2}-\\d{4}";
-
-        System.out.println("TIN format is NNN-NN-NNNN. N is number from 0 to 9.");
-        answer = askStringValue("Enter TIN", false);
-
-        while (!answer.matches(TIN_FORMAT)) {
-            System.out.println("You entered a TIN which does not follow the format NNN-NN-NNNN. Try again");
-            answer = askStringValue("Enter TIN", false);
-        }
-
-        return answer;
-    }
-
-    private static String askStringValue(String question, boolean canBeBlank) {
-        String answer;
-
-        do {
-            System.out.print(question + ": ");
-            answer = scanner.nextLine();
-        } while (!canBeBlank && answer.isBlank());
-
-        return answer;
-    }
-
-    private static int askIntegerValue(String question) {
-        while (true) {
-            try {
-                System.out.print(question + ": ");
-                return Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid value. Please, try again!");
-            }
-        }
-    }
-
-    private static int askIntegerValue(String question, int minValue, int maxValue) {
-        while (true) {
-            try {
-                System.out.print(question + ": ");
-                int answer = Integer.parseInt(scanner.nextLine());
-                if (answer < minValue || answer > maxValue) {
-                    System.out.println("Answer cannot be less than " + minValue + " and more than " + maxValue);
-                } else {
-                    return answer;
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid value. Please, try again!");
-            }
-        }
+        return null;
     }
 }

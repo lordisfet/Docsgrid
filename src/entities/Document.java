@@ -119,8 +119,6 @@ public class Document extends BaseEntity {
         }
     }
 
-    public
-
     @Override
     public String toString() {
         return "Document{" +
