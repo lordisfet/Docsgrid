@@ -17,14 +17,32 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\{\\{([^\\s{}]+)}}");
 
     public DocumentTemplate(int id, String structure, String title) throws DocumentTemplateValidationException {
+        super(id);
+
         if (title == null || title.isBlank()) {
             throw new DocumentTemplateValidationException("Title cannot be null or blank");
         }
 
-        this.id = id;
         this.keys = validatePlaceholders(structure);
         this.structure = structure;
         this.title = title;
+    }
+
+    public DocumentTemplate(int id, String title) {
+        super(id);
+
+        if (title == null || title.isBlank()) {
+            throw new DocumentTemplateValidationException("Title cannot be null or blank");
+        }
+
+        this.title = title;
+    }
+
+    public DocumentTemplate(DocumentTemplate other) {
+        super(other);
+        this.title = other.title;
+        this.structure = other.structure;
+        this.keys = new HashSet<>(other.keys);
     }
 
     /**

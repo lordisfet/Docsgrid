@@ -48,6 +48,11 @@ public class Employee extends BaseUser {
 
     public Employee(Employee other) {
         super(other);
+
+        if (other == null) {
+            throw new UserValidationException("Employee for copy cannot be null");
+        }
+
         this.fullName = other.fullName;
         this.jobPosition = other.jobPosition;
         this.company = other.company;

@@ -2,7 +2,7 @@ package exceptions;
 
 import java.security.PrivilegedActionException;
 
-public class SignatoryValidationException extends Exception {
+public class SignatoryValidationException extends RuntimeException {
     public SignatoryValidationException(String message) {
         super(message);
     }
