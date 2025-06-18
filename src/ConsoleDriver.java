@@ -1,9 +1,11 @@
 import dao.CompanyDAO;
+import dao.DocumentDAO;
 import dao.DocumentTemplateDAO;
 import dao.EmployeeDAO;
 import entities.Company;
 import entities.Document;
 import entities.DocumentTemplate;
+import entities.Signatory;
 import entities.user.Employee;
 import exceptions.CompanyValidationException;
 import exceptions.ConsoleDriverException;
@@ -98,7 +100,7 @@ public class ConsoleDriver {
                 case EmployeeMenuAction.CREATE_DOC -> {
                     // ? -> select template -> filling data -> choose signatories -> this menu
                     System.out.println("\n----- Create new document -----");
-                    createDocument();
+                    createDocument(emp);
                 }
                 case EmployeeMenuAction.LIST_DOCS -> System.out.println("List my signed documents");
                 case EmployeeMenuAction.SHOW_UNSIGNED_DOCS -> System.out.println("Show unsigned documents");
@@ -203,8 +205,11 @@ public class ConsoleDriver {
         }
     }
 
-    private static Document createDocument() {
+    private static void createDocument(Employee employee) {
         DocumentTemplateDAO documentTemplateDAO = new DocumentTemplateDAO();
+        DocumentDAO documentDAO = new DocumentDAO();
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+
         DocumentTemplate documentTemplate;
 
         int id;
@@ -228,14 +233,13 @@ public class ConsoleDriver {
 
             switch (action) {
                 case SELECT_THIS_TEMPLATE -> {
+                    System.out.println("Enter fields");
                     Set<String> keys = documentTemplateDAO.readById(id).getKeys();
-                    Map<String, String> values = new HashMap<>();
 
                     System.out.println("----- Filling out a document -----");
-                    for (String key : keys) {
-                        values.put(key, askStringValue("Enter " + key, false));
-                    }
 
+//                    documentDAO.insert(new Document(documentTemplate, values ));
+                    return;
                 }
                 case CHANGE_TEMPLATE -> {
 
@@ -248,9 +252,18 @@ public class ConsoleDriver {
 
         } while (action != DocumentCreationMenuAction.LEAVE);
 
-
         // TODO: Add logic for creation document
-        return null;
+    }
+
+    private static Map<String, String> setValuesForDocument(Set<String> keys) {
+        Map<String, String> values = new HashMap<>();
+
+        for (String key : keys) {
+
+            values.put(key, askStringValue("Enter " + key, false));
+        }
+
+        return values;
     }
 
 

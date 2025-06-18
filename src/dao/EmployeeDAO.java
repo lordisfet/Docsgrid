@@ -114,8 +114,8 @@ public class EmployeeDAO implements GenericDAO<Employee> {
         }
 
         String sql = "SELECT EXISTS(SELECT 1 FROM employees WHERE tin = ?)";
-        try(Connection conn = DBConnection.connect();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, tin);
 
             ResultSet rs = stmt.executeQuery();
@@ -135,8 +135,8 @@ public class EmployeeDAO implements GenericDAO<Employee> {
         }
 
         String sql = "SELECT id, tin, full_name, password_hash, job, company_id FROM employees WHERE tin = ?";
-        try(Connection conn = DBConnection.connect();
-        PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, tin);
 
             ResultSet rs = stmt.executeQuery();
