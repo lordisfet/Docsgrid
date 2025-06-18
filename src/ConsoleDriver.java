@@ -236,12 +236,15 @@ public class ConsoleDriver {
 
             switch (action) {
                 case SELECT_THIS_TEMPLATE -> {
+//                    FIXME: Now fields of document added for keys no in order how in document.
+//                     I guess we need use List for this.
                     Set<String> keys = documentTemplateDAO.readById(id).getKeys();
                     List<Signatory> signatories = new ArrayList<>();
                     signatories.add(new Signatory(employee, true));
 
                     System.out.println("\n----- Filling out a document -----");
                     Map<String, String> values = setValuesForDocument(keys);
+//                    TODO: Add adding signatory
 
                     return new Document(documentTemplate, values, signatories);
                 }
