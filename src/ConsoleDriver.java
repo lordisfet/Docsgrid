@@ -1,7 +1,4 @@
-import dao.CompanyDAO;
-import dao.DocumentDAO;
-import dao.DocumentTemplateDAO;
-import dao.EmployeeDAO;
+import dao.*;
 import entities.Company;
 import entities.Document;
 import entities.DocumentTemplate;
@@ -95,7 +92,8 @@ public class ConsoleDriver {
             System.out.println("1) Create new document");
             System.out.println("2) List signed documents");
             System.out.println("3) Show unsigned documents");
-            System.out.println("4) Log out\n");
+            System.out.println("4) Sign document");
+            System.out.println("5) Log out\n");
 
             action = EmployeeMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
@@ -104,8 +102,9 @@ public class ConsoleDriver {
                     System.out.println("\n----- Create new document -----");
                     createDocument(emp);
                 }
-                case EmployeeMenuAction.LIST_DOCS -> System.out.println("List my signed documents");
-                case EmployeeMenuAction.SHOW_UNSIGNED_DOCS -> System.out.println("Show unsigned documents");
+                case EmployeeMenuAction.LIST_DOCS -> showDocumentsList(emp, true);
+                case EmployeeMenuAction.SHOW_UNSIGNED_DOCS -> showDocumentsList(emp, false);
+                case EmployeeMenuAction.SIGN_DOC -> signDocumentAction(emp);
                 case EmployeeMenuAction.LOG_OUT -> {
                     System.out.println("Logging out...");
                 }
@@ -188,12 +187,12 @@ public class ConsoleDriver {
         System.out.println("\n----- Employee login -----");
 
         // NOTE: uncomment for real using
-        /*String tin = askTINValue();
+        String tin = askTINValue();
         String password = askStringValue("Enter password", false);
-        employee = employeeDAO.readByTINandPasswordHash(tin, password);*/
+        employee = employeeDAO.readByTINandPasswordHash(tin, password);
 
         // NOTE: test data
-        employee = employeeDAO.readByTINandPasswordHash("000-00-0000", "test");
+//        employee = employeeDAO.readByTINandPasswordHash("000-00-0000", "test");
 
         return employee;
     }
@@ -260,5 +259,83 @@ public class ConsoleDriver {
         } while (action != DocumentCreationMenuAction.LEAVE);
 
         return null;
+    }
+
+    private static void signDocumentAction(Employee emp) {
+        DocumentDAO documentDAO = new DocumentDAO();
+
+        int answer = askIntegerValue("Enter document ID (0 for leave)");
+        if (answer == 0) {
+            System.out.println("Canceled!");
+            return;
+        }
+
+        Document document = documentDAO.readById(answer);
+        if (document == null) {
+            System.out.println("There is no document with this ID");
+            return;
+        }
+
+        boolean isSignatory = false;
+        for (Signatory signatory : document.getSignatories()) {
+            if (signatory.getEmployee().getId().equals(emp.getId())) {
+                if (!signatory.isSigned()) {
+                    isSignatory = true;
+                }
+                break;
+            }
+        }
+
+        if (!isSignatory) {
+            System.out.println("Your signature is not needed on this document or you already signed this document");
+            return;
+        }
+
+        printDocumentOverview(emp, document);
+        String confirmation = askStringValue(
+                "Are you sure that you want to sign this document (y - YES, other - NO)", false);
+        if (!confirmation.toLowerCase().trim().equals("y")) {
+            System.out.println("Canceled!");
+        }
+
+        document.signByEmployee(emp);
+        documentDAO.update(document);
+
+        System.out.println("Document has been successfully signed!");
+    }
+
+    private static void showDocumentsList(Employee employee, boolean signed) {
+        DocumentDAO documentDAO = new DocumentDAO();
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+
+        List<Document> documents = documentDAO.listBySignatoryEmployeeId(employee.getId(), signed);
+
+        for (Document doc : documents) {
+            printDocumentOverview(employee, doc);
+        }
+    }
+
+    private static List<String> getSignatoriesRepresentations(Employee currEmployee, Document doc) {
+        List<String> signatoriesStatuses = new ArrayList<>();
+        for (Signatory signatory : doc.getSignatories()) {
+            Employee signatoryEmp = signatory.getEmployee();
+            String signatorySubstr = signatoryEmp.getFullName() + " (TIN: " + signatoryEmp.getTIN()
+                    + (Objects.equals(signatoryEmp.getId(), currEmployee.getId()) ? ", you) " : ") ")
+                    + (signatory.isSigned() ? "(signed)" : "(unsigned)");
+
+            signatoriesStatuses.add(signatorySubstr);
+        }
+        return signatoriesStatuses;
+    }
+
+    private static void printDocumentOverview(Employee currEmployee, Document doc) {
+        List<String> signatoriesStatuses = getSignatoriesRepresentations(currEmployee, doc);
+
+        System.out.println("--- DOC (ID: " + doc.getId() + ") ---");
+        System.out.println("TITLE:       " + doc.getTemplate().getTitle());
+        System.out.println("SIGNATORIES: " + String.join(", ", signatoriesStatuses));
+        System.out.println("IS VALID?:   " + (doc.isCompleted() ? "YES" : "NO"));
+        System.out.println("\nCONTENT:\n***\n" + doc.render() + "\n***");
+        System.out.println("--- DOC (ID: " + doc.getId() + ") ---\n");
     }
 }
