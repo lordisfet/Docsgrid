@@ -44,7 +44,7 @@ public class EmployeeDAO implements GenericDAO<Employee> {
             throw new IllegalIdException();
         }
 
-        String sql = "SELECT id, tin, fullname, password_hash, job, company_id FROM employees WHERE id = ?";
+        String sql = "SELECT id, tin, full_name, password_hash, job, company_id FROM employees WHERE id = ?";
         try (Connection conn = DBConnection.connect();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -57,10 +57,10 @@ public class EmployeeDAO implements GenericDAO<Employee> {
             return new Employee(
                     rs.getInt("id"),
                     rs.getString("tin"),
-                    rs.getString("full_name"),
                     rs.getString("password_hash"),
+                    rs.getString("full_name"),
                     rs.getString("job"),
-                    new Company(companyDAO.readById(rs.getInt("id"))));
+                    new Company(companyDAO.readById(rs.getInt("company_id"))));
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
