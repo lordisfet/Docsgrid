@@ -229,16 +229,17 @@ public class ConsoleDriver {
             System.out.println("""
                     ----- Document actions -----
                     1) Select this template
-                    2) Select other template
-                    3) Exit from creation document
+                    2) Exit from creation document
                     """);
+//            2) Select other template
+
             action = DocumentCreationMenuAction.values()[askIntegerValue("Document action", 1, actionLenght) - 1];
 
             switch (action) {
                 case SELECT_THIS_TEMPLATE -> {
 //                    FIXME: Now fields of document added for keys no in order how in document.
 //                     I guess we need use List for this.
-                    Set<String> keys = documentTemplateDAO.readById(id).getKeys();
+                    List<String> keys = documentTemplateDAO.readById(id).getKeys();
                     List<Signatory> signatories = new ArrayList<>();
                     signatories.add(new Signatory(employee, true));
 
@@ -247,9 +248,6 @@ public class ConsoleDriver {
 //                    TODO: Add adding signatory
 
                     return new Document(documentTemplate, values, signatories);
-                }
-                case CHANGE_TEMPLATE -> {
-
                 }
                 case LEAVE -> {
                     System.out.println("Leaving from document creation...");

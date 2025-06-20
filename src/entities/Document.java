@@ -33,9 +33,9 @@ public class Document extends BaseEntity {
 
     public void fillContent(Map<String, String> data) throws DocumentValidationException {
         Set<String> dataKeys = data.keySet();
-        Set<String> templateKeys = template.getKeys();
+        List<String> templateKeys = template.getKeys();
 
-        if (!templateKeys.equals(dataKeys)) {
+        if (!new HashSet<>(templateKeys).equals(dataKeys)) {
             throw new DocumentValidationException("Provided data keys don't match the template keys");
         }
 

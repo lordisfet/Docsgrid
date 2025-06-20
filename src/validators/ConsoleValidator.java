@@ -6,10 +6,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class ConsoleValidator {
@@ -116,7 +113,7 @@ public class ConsoleValidator {
         return companyName;
     }
 
-    public static Map<String, String> setValuesForDocument(Set<String> keys) {
+    public static Map<String, String> setValuesForDocument(List<String> keys) {
         Map<String, String> values = new HashMap<>();
 
         for (String key : keys) {
