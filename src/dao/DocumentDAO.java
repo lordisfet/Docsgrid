@@ -10,6 +10,7 @@ import exceptions.DocumentValidationException;
 import exceptions.IllegalIdException;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +70,7 @@ public class DocumentDAO implements GenericDAO<Document> {
                 Map<String,String> content = mapper.readValue(json, new TypeReference<>(){});
                 List<Signatory> signatories = signatoryDAO.findByDocumentId(id);
 
-                return new Document(tpl, content, signatories);
+                return new Document(id, tpl, content, signatories);
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error reading Document", e);
@@ -77,6 +78,46 @@ public class DocumentDAO implements GenericDAO<Document> {
             throw new RuntimeException("Invalid Document data", e);
         } catch (Exception e) {
             throw new RuntimeException("Deserialization error", e);
+        }
+    }
+
+    public List<Document> listBySignatoryEmployeeId(Integer employeeId, boolean signStatus) {
+        if (employeeId == null || employeeId < 1) {
+            throw new IllegalArgumentException("Document cannot be null");
+        }
+        String sql = "SELECT d.id, d.template_id, d.content FROM documents d " +
+                "JOIN signatories s ON s.document_id = d.id WHERE s.employee_id = ? AND sign_status = ?";
+
+        List<Document> documents = new ArrayList<>();
+
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, employeeId);
+            stmt.setBoolean(2, signStatus);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int documentId = rs.getInt("id");
+                    int tplId = rs.getInt("template_id");
+                    String json = rs.getString("content");
+
+                    DocumentTemplate tpl = templateDAO.readById(tplId);
+                    Map<String, String> content = mapper.readValue(json, new TypeReference<>() {});
+
+                    List<Signatory> signatories = signatoryDAO.findByDocumentId(documentId);
+
+                    Document doc = new Document(tpl, content, signatories);
+                    doc.setId(documentId);
+                    documents.add(doc);
+                }
+            }
+
+            return documents;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating Document", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Serialization error", e);
         }
     }
 

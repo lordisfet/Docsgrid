@@ -14,6 +14,27 @@ public class Document extends BaseEntity {
     private Map<String, String> content;
     private final List<Signatory> signatories;
 
+    public Document(Integer id, DocumentTemplate template, Map<String, String> content, List<Signatory> signatories)
+            throws DocumentValidationException {
+        if (id == null || id < 1) {
+            throw new DocumentValidationException("ID cannot be null or less than 1");
+        }
+        if (template == null) {
+            throw new DocumentValidationException("Template cannot be null");
+        }
+        if (content == null || content.isEmpty()) {
+            throw new DocumentValidationException("Content cannot be null or empty");
+        }
+        if (signatories == null || signatories.isEmpty()) {
+            throw new DocumentValidationException("Signatories cannot be null or empty");
+        }
+
+        this.id = id;
+        this.template = template;
+        this.fillContent(content);
+        this.signatories = signatories;
+    }
+
     public Document(DocumentTemplate template, Map<String, String> content, List<Signatory> signatories)
             throws DocumentValidationException {
         if (template == null) {
@@ -52,6 +73,17 @@ public class Document extends BaseEntity {
 
     public List<Signatory> getSignatories() {
         return signatories;
+    }
+
+    public boolean signByEmployee(Employee emp) {
+        for (Signatory signatory : signatories) {
+            if (signatory.getEmployee().getId().equals(emp.getId())) {
+                signatory.setSignStatus(true);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public boolean isCompleted() {
