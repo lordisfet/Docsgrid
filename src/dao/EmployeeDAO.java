@@ -6,13 +6,24 @@ import entities.abstracts.BaseEntity;
 import entities.user.BaseUser;
 import entities.user.Employee;
 import exceptions.IllegalIdException;
+import exceptions.UserValidationException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * DAO for CRUD operations on Employee entities.
+ */
 public class EmployeeDAO implements GenericDAO<Employee> {
+    /**
+     * Inserts a new employee and sets its generated ID.
+     *
+     * @param entity Employee to insert; must not be null
+     * @throws IllegalArgumentException if entity is null
+     * @throws RuntimeException         on SQL errors
+     */
     @Override
     public void insert(Employee entity) {
         if (entity == null) {
@@ -38,6 +49,14 @@ public class EmployeeDAO implements GenericDAO<Employee> {
         }
     }
 
+    /**
+     * Reads an employee by its ID.
+     *
+     * @param id ID of the employee; must be non-null and positive
+     * @return Employee instance or null if not found
+     * @throws IllegalIdException if id is null or less than 1
+     * @throws RuntimeException   on SQL errors
+     */
     @Override
     public Employee readById(Integer id) {
         if (id == null || id < 1) {
@@ -67,6 +86,47 @@ public class EmployeeDAO implements GenericDAO<Employee> {
         }
     }
 
+    /**
+     * Reads an employee by its TIN.
+     *
+     * @param TIN TIN, must be in NNN-NN-NNNN format.
+     * @return Employee instance or null if not found
+     * @throws UserValidationException Incorrect TIN
+     * @throws RuntimeException   on SQL errors
+     */
+    public Employee readByTIN(String TIN) {
+        if (TIN == null || TIN.isBlank()) {
+            throw new UserValidationException("TIN cannot be null or blank");
+        }
+
+        String sql = "SELECT id, tin, full_name, password_hash, job, company_id FROM employees WHERE tin = ?";
+        try (Connection conn = DBConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, TIN);
+
+            ResultSet rs = stmt.executeQuery();
+            CompanyDAO companyDAO = new CompanyDAO();
+            if (rs.next()) {}
+            return new Employee(
+                    rs.getInt("id"),
+                    rs.getString("tin"),
+                    rs.getString("password_hash"),
+                    rs.getString("full_name"),
+                    rs.getString("job"),
+                    new Company(companyDAO.readById(rs.getInt("company_id"))));
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Updates an existing employee.
+     *
+     * @param entity Employee to update; must not be null
+     * @throws IllegalArgumentException if entity is null
+     * @throws RuntimeException         on SQL errors
+     */
     @Override
     public void update(Employee entity) {
         if (entity == null) {
@@ -90,6 +150,13 @@ public class EmployeeDAO implements GenericDAO<Employee> {
         }
     }
 
+    /**
+     * Deletes an employee entity.
+     *
+     * @param entity Employee to delete; must not be null
+     * @throws IllegalArgumentException if entity is null
+     * @throws RuntimeException         on SQL errors
+     */
     @Override
     public void delete(Employee entity) {
         if (entity == null) {
@@ -108,6 +175,14 @@ public class EmployeeDAO implements GenericDAO<Employee> {
         }
     }
 
+    /**
+     * Checks existence of an employee by TIN.
+     *
+     * @param tin Tax Identification Number; must not be null or blank
+     * @return true if an employee with the given TIN exists
+     * @throws IllegalArgumentException if tin is null or blank
+     * @throws RuntimeException         on SQL errors
+     */
     public boolean existsByTIN(String tin) {
         if (tin == null || tin.isBlank()) {
             throw new IllegalArgumentException("TIN cannot be null or empty for exists statement");
@@ -129,6 +204,15 @@ public class EmployeeDAO implements GenericDAO<Employee> {
         return false;
     }
 
+    /**
+     * Reads an employee by TIN and password hash.
+     *
+     * @param tin      Tax Identification Number; must not be null or blank
+     * @param password Password hash; must not be null or blank
+     * @return Employee instance or null if not found
+     * @throws IllegalArgumentException if password is null or blank
+     * @throws RuntimeException         on SQL errors
+     */
     public Employee readByTINandPasswordHash(String tin, String password) {
         if (password == null || password.isBlank()) {
             throw new IllegalArgumentException("password cannot be null or empty for exists statement");

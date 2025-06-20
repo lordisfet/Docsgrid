@@ -2,18 +2,27 @@ package entities;
 
 import entities.abstracts.BaseEntity;
 import entities.user.Employee;
-import exceptions.DocumentTemplateValidationException;
 import exceptions.DocumentValidationException;
-import exceptions.SignatoryValidationException;
-import exceptions.UserValidationException;
 
 import java.util.*;
 
+/**
+ * Represents a document based on a template, with content data and signatories.
+ */
 public class Document extends BaseEntity {
     private final DocumentTemplate template;
     private Map<String, String> content;
     private final List<Signatory> signatories;
 
+    /**
+     * Constructs a Document with an existing ID, template, content, and signatories.
+     *
+     * @param id          document ID; must not be null or less than 1
+     * @param template    document template; must not be null
+     * @param content     map of template keys to values; must not be null or empty
+     * @param signatories list of signatories; must not be null or empty
+     * @throws DocumentValidationException if any validation fails
+     */
     public Document(Integer id, DocumentTemplate template, Map<String, String> content, List<Signatory> signatories)
             throws DocumentValidationException {
         if (id == null || id < 1) {
@@ -35,6 +44,14 @@ public class Document extends BaseEntity {
         this.signatories = signatories;
     }
 
+    /**
+     * Constructs a new Document with template, content, and signatories.
+     *
+     * @param template    document template; must not be null
+     * @param content     map of template keys to values; must not be null or empty
+     * @param signatories list of signatories; must not be null or empty
+     * @throws DocumentValidationException if any validation fails
+     */
     public Document(DocumentTemplate template, Map<String, String> content, List<Signatory> signatories)
             throws DocumentValidationException {
         if (template == null) {
@@ -52,6 +69,12 @@ public class Document extends BaseEntity {
         this.signatories = signatories;
     }
 
+    /**
+     * Validates and sets the document content based on the template keys.
+     *
+     * @param data map of values; keys must match template keys exactly
+     * @throws DocumentValidationException if provided keys do not match template
+     */
     public void fillContent(Map<String, String> data) throws DocumentValidationException {
         Set<String> dataKeys = data.keySet();
         List<String> templateKeys = template.getKeys();
@@ -63,18 +86,39 @@ public class Document extends BaseEntity {
         this.content = new HashMap<>(data);
     }
 
+    /**
+     * Returns the document template.
+     *
+     * @return DocumentTemplate instance
+     */
     public DocumentTemplate getTemplate() {
         return template;
     }
 
+    /**
+     * Returns the document content map.
+     *
+     * @return map of template keys to values
+     */
     public Map<String, String> getContent() {
         return content;
     }
 
+    /**
+     * Returns the list of signatories.
+     *
+     * @return list of Signatory instances
+     */
     public List<Signatory> getSignatories() {
         return signatories;
     }
 
+    /**
+     * Marks the document as signed by the specified employee.
+     *
+     * @param emp employee who signs the document
+     * @return true if the employee was a signatory and is now signed, false otherwise
+     */
     public boolean signByEmployee(Employee emp) {
         for (Signatory signatory : signatories) {
             if (signatory.getEmployee().getId().equals(emp.getId())) {
@@ -86,6 +130,11 @@ public class Document extends BaseEntity {
         return false;
     }
 
+    /**
+     * Checks if all signatories have signed the document.
+     *
+     * @return true if all signed, false otherwise
+     */
     public boolean isCompleted() {
         for (Signatory signatory : this.signatories) {
             if (!signatory.isSigned()) return false;
@@ -94,6 +143,11 @@ public class Document extends BaseEntity {
         return true;
     }
 
+    /**
+     * Renders the document by replacing template placeholders with content values.
+     *
+     * @return rendered document string
+     */
     public String render() {
         String renderedResult = this.template.getStructure();
         for (String dataKey : this.content.keySet()) {
@@ -101,54 +155,6 @@ public class Document extends BaseEntity {
         }
 
         return renderedResult;
-    }
-
-    public static void main(String[] args) {
-        // Demo
-
-        String someStructure = "I, {{name1}}, sign this document with {{name2}}.";
-        try {
-            Company company = new Company(1, "SSU");
-            Employee emp1 = new Employee("111-222-333", "12345", "John", "Manager", company);
-            Employee emp2 = new Employee("222-111-333", "12345", "Bob", "Manager", company);
-
-            DocumentTemplate docTemplate = new DocumentTemplate(0, someStructure, "Test Template");
-
-            System.out.println("\nDocument Template: " + docTemplate);
-            System.out.println("Structure: " + docTemplate.getStructure());
-            System.out.println("Keys: " + docTemplate.getKeys());
-
-            DocumentTemplate docTemplateCopy = docTemplate.clone();
-
-            System.out.println("\nDocument Template Copy: " + docTemplateCopy);
-
-            Map<String, String> content = new HashMap<>();
-
-            content.put("name1", emp1.getFullName());
-            content.put("name2", emp2.getFullName());
-
-            ArrayList<Signatory> signatories = new ArrayList<>();
-
-            signatories.add(new Signatory(emp1, true));
-            signatories.add(new Signatory(emp2, false));
-
-            Document document = new Document(docTemplate, content, signatories);
-
-            System.out.println("\nDocument: " + document);
-
-            String result = document.render();
-            System.out.println("\n" + result);
-            System.out.println("Is completed?: " + document.isCompleted());
-
-        } catch (DocumentTemplateValidationException e) {
-            System.out.println("Template is not validated. " + e.getMessage());
-        } catch (DocumentValidationException e) {
-            System.out.println("Document is not validated. " + e.getMessage());
-        } catch (UserValidationException e) {
-            System.out.println("Employees are not validated. " + e.getMessage());
-        } catch (SignatoryValidationException e) {
-            System.out.println("Signatories are not validated. " + e.getMessage());
-        }
     }
 
     @Override

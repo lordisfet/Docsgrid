@@ -9,7 +9,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * DAO for CRUD operations on Company entities and related queries.
+ */
 public class CompanyDAO implements GenericDAO<Company> {
+    /**
+     * Inserts a new Company and sets its generated ID.
+     *
+     * @param entity Company to insert; must not be null
+     * @throws IllegalArgumentException if entity is null
+     * @throws RuntimeException         on SQL errors
+     */
     @Override
     public void insert(Company entity) {
         if (entity == null) {
@@ -31,6 +41,14 @@ public class CompanyDAO implements GenericDAO<Company> {
 
     }
 
+    /**
+     * Reads a Company by its ID.
+     *
+     * @param id ID of the Company; must be non-null and positive
+     * @return Company instance or null if not found
+     * @throws IllegalIdException if id is null or less than 1
+     * @throws RuntimeException   on SQL errors
+     */
     @Override
     public Company readById(Integer id) {
         if (id == null || id < 1) {
@@ -53,6 +71,14 @@ public class CompanyDAO implements GenericDAO<Company> {
         return null;
     }
 
+    /**
+     * Reads a Company by its name.
+     *
+     * @param companyName name of the Company; must not be null or blank
+     * @return Company instance or null if not found
+     * @throws IllegalArgumentException if companyName is null or blank
+     * @throws RuntimeException         on SQL errors
+     */
     public Company readByName(String companyName) {
         if (companyName == null || companyName.isBlank()) {
             throw new IllegalArgumentException("Company name cannot be null or blank");
@@ -74,6 +100,13 @@ public class CompanyDAO implements GenericDAO<Company> {
         return null;
     }
 
+    /**
+     * Updates an existing Company.
+     *
+     * @param entity Company to update; must not be null
+     * @throws IllegalArgumentException if entity is null
+     * @throws RuntimeException         on SQL errors
+     */
     @Override
     public void update(Company entity) {
         if (entity == null) {
@@ -93,6 +126,13 @@ public class CompanyDAO implements GenericDAO<Company> {
 
     }
 
+    /**
+     * Deletes a Company.
+     *
+     * @param entity Company to delete; must not be null
+     * @throws IllegalArgumentException if entity is null
+     * @throws RuntimeException         on SQL errors
+     */
     @Override
     public void delete(Company entity) {
         if (entity == null) {
@@ -110,6 +150,14 @@ public class CompanyDAO implements GenericDAO<Company> {
         }
     }
 
+    /**
+     * Checks existence of a Company by its name.
+     *
+     * @param companyName name of the Company; must not be null or blank
+     * @return true if a Company with the given name exists
+     * @throws IllegalArgumentException if companyName is null or blank
+     * @throws RuntimeException         on SQL errors
+     */
     public boolean existsByName(String companyName) {
         if (companyName == null || companyName.isBlank()) {
             throw new IllegalArgumentException("Company name cannot be null for exists statement");

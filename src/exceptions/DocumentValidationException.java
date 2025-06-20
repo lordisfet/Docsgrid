@@ -2,7 +2,15 @@ package exceptions;
 
 import java.security.PrivilegedActionException;
 
+/**
+ * Exception thrown when a document fails validation.
+ */
 public class DocumentValidationException extends RuntimeException {
+    /**
+     * Constructs a new DocumentValidationException with the specified detail message.
+     *
+     * @param message the detail message explaining the validation failure
+     */
     public DocumentValidationException(String message) {
         super(message);
     }

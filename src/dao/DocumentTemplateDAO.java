@@ -12,8 +12,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DAO for CRUD operations on DocumentTemplate entities.
+ */
 public class DocumentTemplateDAO implements GenericDAO<DocumentTemplate> {
 
+    /**
+     * Inserts a new DocumentTemplate and sets its generated ID.
+     *
+     * @param entity DocumentTemplate to insert; must not be null
+     * @throws IllegalArgumentException        if entity is null
+     * @throws RuntimeException                on SQL errors
+     */
     @Override
     public void insert(DocumentTemplate entity) {
         if (entity == null) {
@@ -37,6 +47,14 @@ public class DocumentTemplateDAO implements GenericDAO<DocumentTemplate> {
         }
     }
 
+    /**
+     * Reads a DocumentTemplate by its ID.
+     *
+     * @param id ID of the DocumentTemplate; must be non-null and positive
+     * @return DocumentTemplate instance or null if not found
+     * @throws IllegalIdException              if id is null or less than 1
+     * @throws RuntimeException                on SQL errors or validation errors
+     */
     @Override
     public DocumentTemplate readById(Integer id) {
         if (id == null || id < 1) {
@@ -66,6 +84,13 @@ public class DocumentTemplateDAO implements GenericDAO<DocumentTemplate> {
         return null;
     }
 
+    /**
+     * Updates an existing DocumentTemplate.
+     *
+     * @param entity DocumentTemplate to update; must not be null
+     * @throws IllegalArgumentException        if entity is null
+     * @throws RuntimeException                on SQL errors
+     */
     @Override
     public void update(DocumentTemplate entity) {
         if (entity == null) {
@@ -86,6 +111,13 @@ public class DocumentTemplateDAO implements GenericDAO<DocumentTemplate> {
         }
     }
 
+    /**
+     * Deletes a DocumentTemplate.
+     *
+     * @param entity DocumentTemplate to delete; must not be null
+     * @throws IllegalArgumentException        if entity is null
+     * @throws RuntimeException                on SQL errors
+     */
     @Override
     public void delete(DocumentTemplate entity) {
         if (entity == null) {
@@ -102,6 +134,12 @@ public class DocumentTemplateDAO implements GenericDAO<DocumentTemplate> {
         }
     }
 
+    /**
+     * Reads all DocumentTemplates (id and title only).
+     *
+     * @return list of DocumentTemplate instances (empty if none found)
+     * @throws RuntimeException                on SQL errors
+     */
     public ArrayList<DocumentTemplate> readAll() {
         ArrayList<DocumentTemplate> templates = new ArrayList<>();
 

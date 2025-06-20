@@ -2,7 +2,15 @@ package exceptions;
 
 import java.security.PrivilegedActionException;
 
+/**
+ * Exception thrown when a User entity fails validation.
+ */
 public class UserValidationException extends IllegalArgumentException {
+    /**
+     * Constructs a new UserValidationException with the specified detail message.
+     *
+     * @param message the detail message explaining the validation failure
+     */
     public UserValidationException(String message) {
         super(message);
     }
