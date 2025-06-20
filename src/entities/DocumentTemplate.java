@@ -1,6 +1,5 @@
 package entities;
 
-
 import entities.abstracts.BaseEntity;
 import exceptions.DocumentTemplateValidationException;
 
@@ -9,6 +8,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Represents a template for documents, defining a title, structure with placeholders, and extracted keys.
+ */
 public class DocumentTemplate extends BaseEntity implements Cloneable {
     private String title;
     private String structure;
@@ -16,6 +18,15 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
 
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\{\\{([^\\s{}]+)}}");
 
+    /**
+     * Constructs a DocumentTemplate with an ID, structure, and title.
+     * Extracts and validates placeholders from the structure.
+     *
+     * @param id        template ID; passed to BaseEntity
+     * @param structure structure string containing placeholders like {{key}}
+     * @param title     title of the template; must not be null or blank
+     * @throws DocumentTemplateValidationException if title is invalid or placeholders malformed
+     */
     public DocumentTemplate(int id, String structure, String title) throws DocumentTemplateValidationException {
         super(id);
 
@@ -28,7 +39,15 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
         this.title = title;
     }
 
-    public DocumentTemplate(int id, String title) {
+    /**
+     * Constructs a DocumentTemplate with an ID and title only.
+     * Used when structure is set later.
+     *
+     * @param id    template ID; passed to BaseEntity
+     * @param title title of the template; must not be null or blank
+     * @throws DocumentTemplateValidationException if title is invalid
+     */
+    public DocumentTemplate(int id, String title) throws DocumentTemplateValidationException {
         super(id);
 
         if (title == null || title.isBlank()) {
@@ -38,6 +57,12 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
         this.title = title;
     }
 
+    /**
+     * Copy constructor.
+     * Creates a deep copy of keys list.
+     *
+     * @param other DocumentTemplate to copy; must not be null
+     */
     public DocumentTemplate(DocumentTemplate other) {
         super(other);
         this.title = other.title;
@@ -46,11 +71,12 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
     }
 
     /**
-     * Validates that text contains valid non-blank keys with valid {{ (opening) and }} (closing) braces
-     * @param text Example: <code>"Hello, {{name}}! My name is {{myName}}!"</code>
-     * @return Trimmed keys from the text. Example: <code>[name, myName]</code>
-     * @throws DocumentTemplateValidationException If text or placeholders are null or blank
-     * or there are unmatched placeholder braces in the text
+     * Validates and extracts placeholder keys from the given text.
+     * Placeholders must match {{key}} pattern and no unmatched braces remain.
+     *
+     * @param text structure text containing placeholders
+     * @return list of placeholder keys in the order found
+     * @throws DocumentTemplateValidationException if text is null/blank or placeholders malformed
      */
     public static List<String> validatePlaceholders(String text) throws DocumentTemplateValidationException {
         if (text == null || text.isBlank()) {
@@ -77,19 +103,41 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
         return keys;
     }
 
+    /**
+     * Returns the template structure string.
+     *
+     * @return structure with placeholders
+     */
     public String getStructure() {
         return structure;
     }
 
+    /**
+     * Sets a new structure and revalidates placeholders.
+     *
+     * @param structure new structure string; must not be null or blank
+     * @throws DocumentTemplateValidationException if placeholders invalid
+     */
     public void setStructure(String structure) throws DocumentTemplateValidationException {
         this.keys = validatePlaceholders(structure);
         this.structure = structure;
     }
 
+    /**
+     * Returns the template title.
+     *
+     * @return title string
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Sets a new title for the template.
+     *
+     * @param title new title; must not be null or blank
+     * @throws DocumentTemplateValidationException if title is invalid
+     */
     public void setTitle(String title) throws DocumentTemplateValidationException {
         if (title == null || title.isBlank()) {
             throw new DocumentTemplateValidationException("Title cannot be null or blank");
@@ -98,10 +146,20 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
         this.title = title;
     }
 
+    /**
+     * Returns a copy of the placeholder keys.
+     *
+     * @return list of keys
+     */
     public List<String> getKeys() {
         return new ArrayList<>(keys);
     }
 
+    /**
+     * Creates and returns a deep copy of this DocumentTemplate.
+     *
+     * @return cloned DocumentTemplate
+     */
     @Override
     public DocumentTemplate clone() {
         try {
