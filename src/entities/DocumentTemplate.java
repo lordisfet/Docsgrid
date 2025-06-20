@@ -4,15 +4,15 @@ package entities;
 import entities.abstracts.BaseEntity;
 import exceptions.DocumentTemplateValidationException;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DocumentTemplate extends BaseEntity implements Cloneable {
     private String title;
     private String structure;
-    private Set<String> keys;
+    private List<String> keys;
 
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\{\\{([^\\s{}]+)}}");
 
@@ -42,7 +42,7 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
         super(other);
         this.title = other.title;
         this.structure = other.structure;
-        this.keys = new HashSet<>(other.keys);
+        this.keys = new ArrayList<>(other.keys);
     }
 
     /**
@@ -52,13 +52,13 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
      * @throws DocumentTemplateValidationException If text or placeholders are null or blank
      * or there are unmatched placeholder braces in the text
      */
-    public static Set<String> validatePlaceholders(String text) throws DocumentTemplateValidationException {
+    public static List<String> validatePlaceholders(String text) throws DocumentTemplateValidationException {
         if (text == null || text.isBlank()) {
             throw new DocumentTemplateValidationException("Text cannot be null or blank");
         }
 
         Matcher matcher = PLACEHOLDER_PATTERN.matcher(text);
-        Set<String> keys = new HashSet<>();
+        List<String> keys = new ArrayList<>();
 
         while (matcher.find()) {
             String key = matcher.group(1).trim();
@@ -98,8 +98,8 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
         this.title = title;
     }
 
-    public Set<String> getKeys() {
-        return new HashSet<>(keys);
+    public List<String> getKeys() {
+        return new ArrayList<>(keys);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
             DocumentTemplate clone = (DocumentTemplate) super.clone();
 
             if (this.keys != null) {
-                clone.keys = new HashSet<>(this.keys);
+                clone.keys = new ArrayList<>(this.keys);
             }
             return clone;
         } catch (CloneNotSupportedException e) {
