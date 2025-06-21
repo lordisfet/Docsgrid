@@ -100,6 +100,21 @@ public class DocumentDAO implements GenericDAO<Document> {
         }
     }
 
+    /**
+     * Retrieves a mapping of document IDs to their corresponding template titles
+     * for a given signatory employee.
+     * <p>
+     * The method performs a SQL query joining the {@code documents}, {@code document_templates},
+     * and {@code signatories} tables to find all documents that have the specified employee
+     * as a signatory. It returns a {@code Map} where the key is the document ID and the value is
+     * the title of the associated template.
+     * </p>
+     *
+     * @param employeeId the unique identifier of the employee whose signed documents are to be retrieved
+     * @return a {@code Map<Integer, String>} where keys are document IDs and values are template titles;
+     *         an empty map if no documents are found
+     * @throws RuntimeException if a database access error occurs
+     */
     public Map<Integer, String> readAllTitleBySignatoryEmployeeId(Integer employeeId) {
         String sql = "SELECT d.id, t.title FROM documents d " +
                 "JOIN document_templates t ON d.template_id = t.id " +

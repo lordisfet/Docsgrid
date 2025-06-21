@@ -8,6 +8,7 @@ import entities.user.Employee;
 import exceptions.CompanyValidationException;
 import exceptions.ConsoleDriverException;
 import exceptions.UserValidationException;
+
 import menuAction.DocumentCreationMenuAction;
 import menuAction.EmployeeMenuAction;
 import menuAction.GuestMenuAction;
@@ -119,8 +120,6 @@ public class ConsoleDriver {
             action = EmployeeMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
                 case EmployeeMenuAction.CREATE_DOC -> {
-                    // ? -> select template -> filling data -> choose signatories -> this menu
-                    System.out.println("\n----- Create new document -----");
                     createDocument(emp);
                 }
                 case EmployeeMenuAction.LIST_DOCS -> showDocumentsList(emp, true);
@@ -178,8 +177,7 @@ public class ConsoleDriver {
             if (ownerAdding) {
                 jobPosition = "Owner";
                 System.out.println("Enter job: Owner");
-            }
-            else {
+            } else {
                 jobPosition = askStringValue("Enter job", false);
             }
             String password = askStringValue("Enter password", false);
@@ -261,9 +259,9 @@ public class ConsoleDriver {
      * persists the document, and returns the new Document.
      *
      * @param creator the Employee creating the document
-     * @return the persisted Document or null if creation is aborted
+     * @return void
      */
-    private static Document createDocument(Employee creator) {
+    private static void createDocument(Employee creator) {
         DocumentTemplateDAO templateDAO = new DocumentTemplateDAO();
         DocumentDAO documentDAO = new DocumentDAO();
         EmployeeDAO employeeDAO = new EmployeeDAO();
@@ -271,58 +269,65 @@ public class ConsoleDriver {
         DocumentTemplate template;
         int id;
         int menuSize = DocumentCreationMenuAction.values().length;
-        DocumentCreationMenuAction action = null;
 
-        do {
-            showAllDocumentTemplates();
+        System.out.println("""
+                \n----- Document actions -----
+                1) Create by template
+                2) Create from previous document
+                3) Leave
+                """);
 
-            id = askIntegerValue("\nChoose document's template by id");
-            template = templateDAO.readById(id);
-            if (template == null) {
-                System.out.println("Template not found. Try again.");
-                continue;
+        DocumentCreationMenuAction action = DocumentCreationMenuAction.values()
+                [askIntegerValue("Action", 1, menuSize) - 1];
+
+        switch (action) {
+            case CREATE_BY_TEMPLATE -> {
+                showAllDocumentTemplates();
+
+                id = askIntegerValue("\nChoose document's template by id");
+                template = templateDAO.readById(id);
+                if (template == null) {
+                    System.out.println("Template not found. Try again.");
+                }
+                System.out.println("\nStructure: " + template.getStructure());
+
+                List<String> keys = template.getKeys();
+                System.out.println("\n----- Filling out the document -----");
+                Map<String, String> values = setValuesForDocument(keys);
+
+                List<Signatory> signatories = new ArrayList<>();
+                signatories.add(new Signatory(creator, true)); // creator signs automatically
+
+                System.out.println("\n----- Add additional signatories -----");
+                while (true) {
+                    String tin = askStringValue("Enter signatory TIN (blank to finish)", true);
+                    if (tin.isBlank()) break;
+                    if (!employeeDAO.existsByTIN(tin)) {
+                        System.out.println("No employee found with TIN: " + tin);
+                        continue;
+                    }
+
+                    Employee emp = employeeDAO.readByTIN(tin);
+                    if (emp == null) {
+                        System.out.println("Error loading employee with TIN: " + tin);
+                        continue;
+                    }
+                    signatories.add(new Signatory(emp, false));
+                    System.out.println("Added signatory: " + emp.getFullName());
+                }
+
+                Document document = new Document(template, values, signatories);
+                documentDAO.insert(document);
+                System.out.println("Document created with ID: " + document.getId());
             }
-            System.out.println("\nStructure: " + template.getStructure());
-            System.out.println("----- Document actions -----");
-            System.out.println("1) Select this template");
-            System.out.println("2) Exit from creation document");
+            case CREATE_BASED_ON -> {
 
-            action = DocumentCreationMenuAction.values()[askIntegerValue("Document action", 1, menuSize) - 1];
-            if (action == DocumentCreationMenuAction.LEAVE) {
-                System.out.println("Leaving document creation...");
-                return null;
             }
-        } while (action != DocumentCreationMenuAction.SELECT_THIS_TEMPLATE);
-
-        List<String> keys = template.getKeys();
-        System.out.println("\n----- Filling out the document -----");
-        Map<String, String> values = setValuesForDocument(keys);
-
-        List<Signatory> signatories = new ArrayList<>();
-        signatories.add(new Signatory(creator, true)); // creator signs automatically
-
-        System.out.println("\n----- Add additional signatories -----");
-        while (true) {
-            String tin = askStringValue("Enter signatory TIN (blank to finish)", true);
-            if (tin.isBlank()) break;
-            if (!employeeDAO.existsByTIN(tin)) {
-                System.out.println("No employee found with TIN: " + tin);
-                continue;
+            case LEAVE -> {
+                System.out.println("Here");
+                return;
             }
-
-            Employee emp = employeeDAO.readByTIN(tin);
-            if (emp == null) {
-                System.out.println("Error loading employee with TIN: " + tin);
-                continue;
-            }
-            signatories.add(new Signatory(emp, false));
-            System.out.println("Added signatory: " + emp.getFullName());
         }
-
-        Document document = new Document(template, values, signatories);
-        documentDAO.insert(document);
-        System.out.println("Document created with ID: " + document.getId());
-        return document;
     }
 
     /**

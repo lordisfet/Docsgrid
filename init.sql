@@ -50,10 +50,10 @@ INSERT INTO companies(company_name) VALUES ('SSU');
 INSERT INTO companies(company_name) VALUES ('without company');
 
 INSERT INTO employees(tin, full_name, password_hash, job, company_id)
-VALUES ('111-22-3333', 'Admin', '$2a$12$URtSLcNKRp5xeK5P8EANveNMmypyHLqjFplBgRh5F2bKbqDTuINEe', 'Owner', 1);
-
-INSERT INTO employees(tin, full_name, password_hash, job, company_id)
-VALUES ('222-11-3333', 'User', '$2a$12$d38kaIglWr.6JajCOqifqudM.rMYvbKheCHb0xBDfZaewkXiwGsVW', 'Analyst', 1);
+VALUES
+    ('111-22-3333', 'Admin', '$2a$12$URtSLcNKRp5xeK5P8EANveNMmypyHLqjFplBgRh5F2bKbqDTuINEe', 'Owner', 1),
+    ('222-11-3333', 'User', '$2a$12$d38kaIglWr.6JajCOqifqudM.rMYvbKheCHb0xBDfZaewkXiwGsVW', 'Analyst', 1),
+    ('000-00-0000','Max','$2a$12$s68zxc3699DhkUf4BpQcquEaO2uTy.golNYtCW9V1e.YrHuP5CONG','Java developer',1);
 
 INSERT INTO document_templates(structure, title) VALUES ('I, {{name1}}, hire person {{name2}} on the position {{job}}', 'Employment');
 INSERT INTO document_templates(structure, title) VALUES ('I, {{name1}}, sell {{sell_item}} to {{name2}} for {{amount}} USD', 'Sell Contract (USD)');
