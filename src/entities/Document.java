@@ -12,7 +12,7 @@ import java.util.*;
 public class Document extends BaseEntity {
     private final DocumentTemplate template;
     private Map<String, String> content;
-    private final List<Signatory> signatories;
+    private List<Signatory> signatories;
 
     /**
      * Constructs a Document with an existing ID, template, content, and signatories.

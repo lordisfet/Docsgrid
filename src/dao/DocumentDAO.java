@@ -11,6 +11,7 @@ import exceptions.IllegalIdException;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -96,6 +97,27 @@ public class DocumentDAO implements GenericDAO<Document> {
             throw new RuntimeException("Invalid Document data", e);
         } catch (Exception e) {
             throw new RuntimeException("Deserialization error", e);
+        }
+    }
+
+    public Map<Integer, String> readAllTitleBySignatoryEmployeeId(Integer employeeId) {
+        String sql = "SELECT d.id, t.title FROM documents d " +
+                "JOIN document_templates t ON d.template_id = t.id " +
+                "JOIN signatories s ON s.document_id = d.id AND s.employee_id = ? ";
+        try (Connection conn = DBConnection.connect();
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
+            Map<Integer, String> documents = new LinkedHashMap();
+
+            stmt.setInt(1, employeeId);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                documents.put(rs.getInt("d.id"), rs.getString("t.title"));
+            }
+
+            return documents;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
