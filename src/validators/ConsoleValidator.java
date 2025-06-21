@@ -214,6 +214,22 @@ public class ConsoleValidator {
     }
 
     /**
+     * Extract TINs from data after setValuesForDocument handling
+     * @param validData data after setValuesForDocument handling
+     * @return Set with TINs
+     */
+    public static Set<String> extractTINsFromData(Map<String, String> validData) {
+        Set<String> TINs = new HashSet<>();
+        for (String field : validData.keySet()) {
+            if (extractFieldType(field).equals("tin")) {
+                TINs.add(validData.get(field));
+            }
+        }
+
+        return TINs;
+    }
+
+    /**
      * Extracts the trailing capitalized word from a key to determine field type.
      * Defaults to the full key if no match.
      *

@@ -145,17 +145,13 @@ public class Document extends BaseEntity {
      * Marks the document as signed by the specified employee.
      *
      * @param emp employee who signs the document
-     * @return true if the employee was a signatory and is now signed, false otherwise
      */
-    public boolean signByEmployee(Employee emp) {
+    public void signByEmployee(Employee emp) {
         for (Signatory signatory : signatories) {
             if (signatory.getEmployee().getId().equals(emp.getId())) {
                 signatory.setSignStatus(true);
-                return true;
             }
         }
-
-        return false;
     }
 
     /**

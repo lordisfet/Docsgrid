@@ -51,13 +51,13 @@ INSERT INTO companies(company_name) VALUES ('without company');
 
 INSERT INTO employees(tin, full_name, password_hash, job, company_id)
 VALUES
-    ('111-22-3333', 'Admin', '$2a$12$URtSLcNKRp5xeK5P8EANveNMmypyHLqjFplBgRh5F2bKbqDTuINEe', 'Owner', 1),
-    ('222-11-3333', 'User', '$2a$12$d38kaIglWr.6JajCOqifqudM.rMYvbKheCHb0xBDfZaewkXiwGsVW', 'Analyst', 1),
+    ('111-22-3333', 'Admin', '$2a$12$8GwdKtF7e0G8d0pt7nieJuMtx3a3/uPgy6px.Af0.T.lZjI579T5a', 'Owner', 1),
+    ('222-11-3333', 'User', '$2a$12$8GwdKtF7e0G8d0pt7nieJuMtx3a3/uPgy6px.Af0.T.lZjI579T5a', 'Analyst', 1),
     ('000-00-0000','Max','$2a$12$s68zxc3699DhkUf4BpQcquEaO2uTy.golNYtCW9V1e.YrHuP5CONG','Java developer',1);
 
 INSERT INTO document_templates(structure, title) VALUES ('I, {{name1}}, hire person {{name2}} on the position {{job}}', 'Employment');
 INSERT INTO document_templates(structure, title) VALUES ('I, {{name1}}, sell {{sell_item}} to {{name2}} for {{amount}} USD', 'Sell Contract (USD)');
-INSERT INTO document_templates(structure, title) VALUES ('I, {{name1}}, authorize the use of {{share_item}} to {{name2}}', 'Sharing');
+INSERT INTO document_templates(structure, title) VALUES ('I, {{tin1}}, authorize the use of {{share_item}} to {{tin2}}', 'Sharing');
 
 INSERT INTO documents(template_id, content) VALUES (1, '{"name1":"Admin","name2":"User","job":"Analyst"}');
 INSERT INTO documents(template_id, content) VALUES (2, '{"name1":"User","name2":"Admin","sell_item":"BMW X5","amount":"20000"}');

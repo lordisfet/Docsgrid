@@ -12,6 +12,7 @@ import exceptions.UserValidationException;
 import menuAction.DocumentCreationMenuAction;
 import menuAction.EmployeeMenuAction;
 import menuAction.GuestMenuAction;
+import org.mindrot.jbcrypt.BCrypt;
 import validators.ConsoleValidator;
 
 import javax.print.Doc;
@@ -77,9 +78,9 @@ public class ConsoleDriver {
                     registrationUser(false);
                 }
                 case GuestMenuAction.LOGIN -> {
-//                    Employee employee = loginUser();
+                    Employee employee = loginUser();
                     try {
-                        employeeMenu(new Employee(1, "111-22-3333", "123", "Admin", "Owner", new Company(1, "SSU")));
+                        employeeMenu(employee);
                         System.out.println("\nLogin was successful");
                     } catch (ConsoleDriverException e) {
                         System.out.println("\nLogin with this TIN or/and password not exists");
@@ -315,6 +316,19 @@ public class ConsoleDriver {
 
                 List<Signatory> signatories = new ArrayList<>();
                 signatories.add(new Signatory(creator, true)); // creator signs automatically
+                Set<String> mentionedTINs = extractTINsFromData(values);
+                for (String mentionedTIN : mentionedTINs) {
+                    if (mentionedTIN == null || mentionedTIN.isBlank() || creator.getTIN().equals(mentionedTIN)) {
+                        continue;
+                    }
+
+                    Employee mentionedEmp = employeeDAO.readByTIN(mentionedTIN);
+                    if (mentionedEmp == null) {
+                        continue;
+                    }
+
+                    signatories.add(new Signatory(mentionedEmp, false));
+                }
 
                 System.out.println("\n----- Add additional signatories -----");
                 while (true) {
@@ -324,12 +338,18 @@ public class ConsoleDriver {
                         System.out.println("No employee found with TIN: " + tin);
                         continue;
                     }
+                    if (mentionedTINs.contains(tin)) {
+                        System.out.println("This signatory is already mentioned");
+                        continue;
+                    }
 
                     Employee emp = employeeDAO.readByTIN(tin);
                     if (emp == null) {
                         System.out.println("Error loading employee with TIN: " + tin);
                         continue;
                     }
+
+                    mentionedTINs.add(emp.getTIN());
                     signatories.add(new Signatory(emp, false));
                     System.out.println("Added signatory: " + emp.getFullName());
                 }
