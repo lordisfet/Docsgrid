@@ -194,6 +194,18 @@ public class Document extends BaseEntity implements Cloneable {
                 '}';
     }
 
+    /**
+     * Creates a deep copy of this {@code Document} instance.
+     * <p>
+     * This method overrides {@code Object.clone()} and performs cloning of
+     * the {@code content} map and {@code signatories} list to ensure that
+     * the cloned document is independent from the original. If {@code content}
+     * or {@code signatories} are {@code null}, they will be skipped.
+     * </p>
+     *
+     * @return a cloned {@code Document} object with deep-copied fields
+     * @throws AssertionError if the cloning operation is not supported
+     */
     @Override
     public Document clone() {
         try {
