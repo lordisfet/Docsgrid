@@ -77,9 +77,10 @@ public class ConsoleDriver {
                     registrationUser(false);
                 }
                 case GuestMenuAction.LOGIN -> {
-//                    Employee employee = loginUser();
+                    Employee employee = loginUser();
                     try {
-                        employeeMenu(new Employee(1, "111-22-3333", "123", "Admin", "Owner", new Company(1, "SSU")));
+//                        employeeMenu(new Employee(1, "111-22-3333", "123", "Admin", "Owner", new Company(1, "SSU")));
+                        employeeMenu(employee);
                         System.out.println("\nLogin was successful");
                     } catch (ConsoleDriverException e) {
                         System.out.println("\nLogin with this TIN or/and password not exists");
@@ -360,12 +361,11 @@ public class ConsoleDriver {
 
                 Document original = dao.readById(id);
                 printDocumentOverview(creator, original);
-                Document copy = editDocumentContent(original);
+                Document copy = editDocumentContent(original.clone());
 
                 dao.insert(copy);
             }
             case LEAVE -> {
-                System.out.println("Here");
                 return;
             }
         }

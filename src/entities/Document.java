@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Represents a document based on a template, with content data and signatories.
  */
-public class Document extends BaseEntity {
+public class Document extends BaseEntity implements Cloneable {
     private final DocumentTemplate template;
     private Map<String, String> content;
     private List<Signatory> signatories;
@@ -193,4 +193,28 @@ public class Document extends BaseEntity {
                 ", signatories=" + signatories +
                 '}';
     }
+
+    @Override
+    public Document clone() {
+        try {
+            Document clone = (Document) super.clone();
+
+            if (this.content != null) {
+                clone.content = new HashMap<>(this.content);
+            }
+
+            if (this.signatories != null) {
+                List<Signatory> clonedSignatories = new ArrayList<>();
+                for (Signatory s : this.signatories) {
+                    clonedSignatories.add(new Signatory(s));
+                }
+                clone.signatories = clonedSignatories;
+            }
+
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Cloning failed", e);
+        }
+    }
+
 }
