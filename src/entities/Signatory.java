@@ -27,6 +27,20 @@ public class Signatory {
     }
 
     /**
+     * Creates a shallow copy of the specified {@code Signatory}.
+     * <p>
+     * This constructor copies references to the {@code employee} and {@code signStatus} fields.
+     * If these fields are mutable, consider whether a deep copy is needed to ensure immutability.
+     * </p>
+     *
+     * @param s the {@code Signatory} instance to copy
+     */
+    public Signatory(Signatory s) {
+        this.employee = s.employee;
+        this.signStatus = s.signStatus;
+    }
+
+    /**
      * Returns the associated employee.
      *
      * @return employee who signs

@@ -12,7 +12,7 @@ import java.util.*;
 public class Document extends BaseEntity {
     private final DocumentTemplate template;
     private Map<String, String> content;
-    private final List<Signatory> signatories;
+    private List<Signatory> signatories;
 
     /**
      * Constructs a Document with an existing ID, template, content, and signatories.
@@ -67,6 +67,34 @@ public class Document extends BaseEntity {
         this.template = template;
         this.fillContent(content);
         this.signatories = signatories;
+    }
+
+    /**
+     * Constructs a deep copy of the specified {@code Document}.
+     * <p>
+     * This copy constructor performs deep copies of the {@code template},
+     * {@code content}, and {@code signatories} fields, ensuring that
+     * the new instance is fully independent of the original.
+     * </p>
+     *
+     * @param document the {@code Document} to copy
+     * @throws IllegalArgumentException if the input {@code document} is {@code null}
+     */
+    public Document(Document document) {
+        super(document);
+
+        if (document == null) {
+            throw new IllegalArgumentException("Document to copy cannot be null");
+        }
+
+        this.template = new DocumentTemplate(document.template);
+
+        this.content = new HashMap<>(document.content);
+
+        this.signatories = new ArrayList<>();
+        for (Signatory s : document.signatories) {
+            this.signatories.add(new Signatory(s));
+        }
     }
 
     /**

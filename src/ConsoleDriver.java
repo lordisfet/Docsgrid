@@ -8,9 +8,11 @@ import entities.user.Employee;
 import exceptions.CompanyValidationException;
 import exceptions.ConsoleDriverException;
 import exceptions.UserValidationException;
+
 import menuAction.DocumentCreationMenuAction;
 import menuAction.EmployeeMenuAction;
 import menuAction.GuestMenuAction;
+import validators.ConsoleValidator;
 
 import javax.print.Doc;
 import java.util.*;
@@ -43,7 +45,7 @@ public class ConsoleDriver {
      */
     private static Employee fakeAuthorizeEmployee() {
         try {
-            return new Employee("12345-174678-500", "1212", "Johny",
+            return new Employee("111-22-3333", "123", "Johny",
                     "Manager", new Company("SSU"));
         } catch (UserValidationException e) {
             System.out.println("Validation error. Message: " + e.getMessage());
@@ -71,11 +73,13 @@ public class ConsoleDriver {
 
             action = GuestMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
-                case GuestMenuAction.SIGN_UP -> registrationUser();
+                case GuestMenuAction.SIGN_UP -> {
+                    registrationUser(false);
+                }
                 case GuestMenuAction.LOGIN -> {
-                    Employee employee = loginUser();
+//                    Employee employee = loginUser();
                     try {
-                        employeeMenu(employee);
+                        employeeMenu(new Employee(1, "111-22-3333", "123", "Admin", "Owner", new Company(1, "SSU")));
                         System.out.println("\nLogin was successful");
                     } catch (ConsoleDriverException e) {
                         System.out.println("\nLogin with this TIN or/and password not exists");
@@ -117,7 +121,6 @@ public class ConsoleDriver {
             action = EmployeeMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
                 case EmployeeMenuAction.CREATE_DOC -> {
-                    System.out.println("\n----- Create new document -----");
                     createDocument(emp);
                 }
                 case EmployeeMenuAction.LIST_DOCS -> showDocumentsList(emp, true);
@@ -131,7 +134,7 @@ public class ConsoleDriver {
     /**
      * Handles employee registration flow via console prompts.
      */
-    public static void registrationUser() {
+    public static void registrationUser(boolean ownerAdding) {
         Company company = null;
         CompanyDAO companyDAO = new CompanyDAO();
         EmployeeDAO employeeDAO = new EmployeeDAO();
@@ -160,7 +163,7 @@ public class ConsoleDriver {
             String tin;
 
             do {
-                tin = askTINValue();
+                tin = askTINValue("Enter TIN");
                 if (tin.isBlank()) {
                     System.out.println("\nReturning...");
                     return;
@@ -171,7 +174,13 @@ public class ConsoleDriver {
             } while (employeeDAO.existsByTIN(tin));
 
             String fullName = askStringValue("Enter full name", false);
-            String jobPosition = askStringValue("Enter job", false);
+            String jobPosition;
+            if (ownerAdding) {
+                jobPosition = "Owner";
+                System.out.println("Enter job: Owner");
+            } else {
+                jobPosition = askStringValue("Enter job", false);
+            }
             String password = askStringValue("Enter password", false);
 
             Employee employee = new Employee(tin, password, fullName, jobPosition, company);
@@ -192,12 +201,17 @@ public class ConsoleDriver {
      */
     public static void registrationCompany() {
         System.out.println("\n----- Company registration -----");
-        String companyName = askStringValue("Enter company name", false);
+        String companyName = askStringValue("Enter company name", true);
+        if (companyName.isBlank()) {
+            System.out.println("\nReturning...");
+            return;
+        }
 
         CompanyDAO dao = new CompanyDAO();
 
         if (!dao.existsByName(companyName)) {
             dao.insert(new Company(companyName));
+            registrationUser(true);
             System.out.println("\nCompany registered successful\n");
         } else {
             System.out.println("\nCompany with name " + companyName + " already exists\n");
@@ -212,7 +226,7 @@ public class ConsoleDriver {
     public static Employee loginUser() {
         System.out.println("\n----- Employee login -----");
 
-        String tin = askTINValue();
+        String tin = askTINValue("Enter TIN");
         String password = askStringValue("Enter password", false);
 
         EmployeeDAO dao = new EmployeeDAO();
@@ -233,16 +247,13 @@ public class ConsoleDriver {
     }
 
     /**
-     * Displays all available document templates.
+     * Get all available document templates.
      */
-    private static void showAllDocumentTemplates() {
+    private static ArrayList<DocumentTemplate> getAllDocumentTemplates() {
         DocumentTemplateDAO dao = new DocumentTemplateDAO();
         ArrayList<DocumentTemplate> templates = dao.readAll();
 
-        System.out.println("List of all templates:");
-        for (int i = 0; i < templates.size(); i++) {
-            System.out.println("\t" + templates.get(i).getId() + ") " + templates.get(i).getTitle());
-        }
+        return templates;
     }
 
     /**
@@ -250,9 +261,9 @@ public class ConsoleDriver {
      * persists the document, and returns the new Document.
      *
      * @param creator the Employee creating the document
-     * @return the persisted Document or null if creation is aborted
+     * @return void
      */
-    private static Document createDocument(Employee creator) {
+    private static void createDocument(Employee creator) {
         DocumentTemplateDAO templateDAO = new DocumentTemplateDAO();
         DocumentDAO documentDAO = new DocumentDAO();
         EmployeeDAO employeeDAO = new EmployeeDAO();
@@ -260,58 +271,180 @@ public class ConsoleDriver {
         DocumentTemplate template;
         int id;
         int menuSize = DocumentCreationMenuAction.values().length;
-        DocumentCreationMenuAction action = null;
 
-        do {
-            showAllDocumentTemplates();
+        System.out.println("""
+                \n----- Document actions -----
+                1) Create by template
+                2) Create from previous document
+                3) Leave
+                """);
 
-            id = askIntegerValue("\nChoose document's template by id");
-            template = templateDAO.readById(id);
-            if (template == null) {
-                System.out.println("Template not found. Try again.");
-                continue;
+        DocumentCreationMenuAction action = DocumentCreationMenuAction.values()
+                [askIntegerValue("Action", 1, menuSize) - 1];
+
+        switch (action) {
+            case CREATE_BY_TEMPLATE -> {
+                ArrayList<DocumentTemplate> templates = getAllDocumentTemplates();
+                System.out.println("List of all templates:");
+                for (int i = 0; i < templates.size(); i++) {
+                    System.out.println("\t" + templates.get(i).getId() + ") " + templates.get(i).getTitle());
+                }
+                int lastTemplate = templates.getLast().getId();
+                System.out.println('\t' + lastTemplate + 1 + ") Leave");
+
+                id = askIntegerValue("\nChoose document's template by id");
+                if (id == lastTemplate + 1) {
+                    return;
+                }
+
+                try {
+                    template = templateDAO.readById(id);
+                } catch (NullPointerException e) {
+                    System.out.println(e.getMessage());
+                    return;
+                }
+
+                if (template == null) {
+                    System.out.println("Template not found. Try again.");
+                }
+                System.out.println("\nStructure: " + template.getStructure());
+
+                List<String> keys = template.getKeys();
+                System.out.println("\n----- Filling out the document -----");
+                Map<String, String> values = setValuesForDocument(keys);
+
+                List<Signatory> signatories = new ArrayList<>();
+                signatories.add(new Signatory(creator, true)); // creator signs automatically
+
+                System.out.println("\n----- Add additional signatories -----");
+                while (true) {
+                    String tin = askStringValue("Enter signatory TIN (blank to finish)", true);
+                    if (tin.isBlank()) break;
+                    if (!employeeDAO.existsByTIN(tin)) {
+                        System.out.println("No employee found with TIN: " + tin);
+                        continue;
+                    }
+
+                    Employee emp = employeeDAO.readByTIN(tin);
+                    if (emp == null) {
+                        System.out.println("Error loading employee with TIN: " + tin);
+                        continue;
+                    }
+                    signatories.add(new Signatory(emp, false));
+                    System.out.println("Added signatory: " + emp.getFullName());
+                }
+
+                Document document = new Document(template, values, signatories);
+                documentDAO.insert(document);
+                System.out.println("Document created with ID: " + document.getId());
             }
-            System.out.println("\nStructure: " + template.getStructure());
-            System.out.println("----- Document actions -----");
-            System.out.println("1) Select this template");
-            System.out.println("2) Exit from creation document");
+            case CREATE_BASED_ON -> {
+                DocumentDAO dao = new DocumentDAO();
+                Map<Integer, String> documentsTitles = dao.readAllTitleBySignatoryEmployeeId(creator.getId());
+                List<Integer> ids = new ArrayList<>();
 
-            action = DocumentCreationMenuAction.values()[askIntegerValue("Document action", 1, menuSize) - 1];
-            if (action == DocumentCreationMenuAction.LEAVE) {
-                System.out.println("Leaving document creation...");
-                return null;
+                System.out.println("\nList of title your documents: ");
+                for (Map.Entry<Integer, String> entry : documentsTitles.entrySet()) {
+                    id = entry.getKey();
+                    ids.add(id);
+                    String title = entry.getValue();
+                    System.out.println("ID: " + id + ", Title: " + title);
+                }
+
+                do {
+                    id = askIntegerValue("\nEnter what document you want use how base");
+                    if (!ids.contains(id)) {
+                        System.out.println("Invalid document`s ID. Please try again.");
+                    }
+                } while (!ids.contains(id));
+
+                Document original = dao.readById(id);
+                printDocumentOverview(creator, original);
+                Document copy = editDocumentContent(original);
+
+                dao.insert(copy);
             }
-        } while (action != DocumentCreationMenuAction.SELECT_THIS_TEMPLATE);
-
-        List<String> keys = template.getKeys();
-        System.out.println("\n----- Filling out the document -----");
-        Map<String, String> values = setValuesForDocument(keys);
-
-        List<Signatory> signatories = new ArrayList<>();
-        signatories.add(new Signatory(creator, true)); // creator signs automatically
-
-        System.out.println("\n----- Add additional signatories -----");
-        while (true) {
-            String tin = askStringValue("Enter signatory TIN (blank to finish)", true);
-            if (tin.isBlank()) break;
-            if (!employeeDAO.existsByTIN(tin)) {
-                System.out.println("No employee found with TIN: " + tin);
-                continue;
+            case LEAVE -> {
+                System.out.println("Here");
+                return;
             }
+        }
+    }
 
-            Employee emp = employeeDAO.readByTIN(tin);
-            if (emp == null) {
-                System.out.println("Error loading employee with TIN: " + tin);
-                continue;
-            }
-            signatories.add(new Signatory(emp, false));
-            System.out.println("Added signatory: " + emp.getFullName());
+    /**
+     * Interactively edits the content fields of the specified {@code Document} via console input.
+     * <p>
+     * This method displays all current key-value content fields and allows the user to modify them
+     * by entering the field name and providing a new value, validated by type (e.g., TIN, date, email, number).
+     * The field type is inferred via {@code extractFieldType}, and appropriate validators from
+     * {@code ConsoleValidator} are used to ensure input correctness.
+     * </p>
+     *
+     * <p>
+     * The method returns a new {@code Document} instance as a deep copy of the input document,
+     * preserving updated content. If the input document has no editable content,
+     * the method logs a message and returns {@code null}.
+     * </p>
+     *
+     * @param document the {@code Document} whose content is to be edited
+     * @return a new {@code Document} reflecting the edited content, or {@code null} if no content is present
+     */
+
+    public static Document editDocumentContent(Document document) {
+        Map<String, String> content = document.getContent();
+        if (content == null || content.isEmpty()) {
+            System.out.println("Document has no content to edit.");
+            return null;
         }
 
-        Document document = new Document(template, values, signatories);
-        documentDAO.insert(document);
-        System.out.println("Document created with ID: " + document.getId());
-        return document;
+        String input;
+
+        while (true) {
+            System.out.println("\nCurrent fields in the document:");
+            for (Map.Entry<String, String> entry : content.entrySet()) {
+                System.out.println("- " + entry.getKey() + ": " + entry.getValue());
+            }
+
+            input = askStringValue("\nEnter the field name to change(press Enter to finish)", true);
+
+            if (input.isBlank()) {
+                System.out.println("\nReturning...");
+                break;
+            }
+
+            if (!content.containsKey(input)) {
+                System.out.println("Field \"" + input + "\" does not exist. Please try again.");
+                continue;
+            }
+
+            String newValue;
+            switch (extractFieldType(input)) {
+                case "tin":
+                    newValue = ConsoleValidator.askTINValue("Enter new TIN");
+                    break;
+                case "date":
+                    newValue = ConsoleValidator.askDateValue();
+                    break;
+                case "email":
+                case "gmail":
+                    newValue = ConsoleValidator.askEmailValue();
+                    break;
+                case "paymentamount":
+                case "number":
+                    newValue = ConsoleValidator.askNumberValue();
+                    break;
+                case "companyname":
+                    newValue = ConsoleValidator.askExistingCompanyName();
+                    break;
+                default:
+                    newValue = ConsoleValidator.askStringValue("Enter new \"" + input + "\"", false);
+            }
+
+            content.put(input, newValue);
+            System.out.println("\nField updated.");
+        }
+
+        return new Document(document);
     }
 
     /**
