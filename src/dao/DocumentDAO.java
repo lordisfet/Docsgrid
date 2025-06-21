@@ -127,7 +127,7 @@ public class DocumentDAO implements GenericDAO<Document> {
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                documents.put(rs.getInt("d.id"), rs.getString("t.title"));
+                documents.put(rs.getInt("id"), rs.getString("title"));
             }
 
             return documents;
