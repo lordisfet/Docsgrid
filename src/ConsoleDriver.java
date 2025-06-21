@@ -320,9 +320,7 @@ public class ConsoleDriver {
                 documentDAO.insert(document);
                 System.out.println("Document created with ID: " + document.getId());
             }
-            case CREATE_BASED_ON -> {
-
-            }
+            case CREATE_BASED_ON -> {}
             case LEAVE -> {
                 System.out.println("Here");
                 return;
