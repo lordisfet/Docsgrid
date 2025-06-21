@@ -5,5 +5,6 @@ package menuAction;
  */
 public enum DocumentCreationMenuAction {
     SELECT_THIS_TEMPLATE,
+    CREATE_BASED_ON,
     LEAVE
 }

@@ -71,7 +71,9 @@ public class ConsoleDriver {
 
             action = GuestMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
-                case GuestMenuAction.SIGN_UP -> registrationUser();
+                case GuestMenuAction.SIGN_UP -> {
+                    registrationUser(false);
+                }
                 case GuestMenuAction.LOGIN -> {
                     Employee employee = loginUser();
                     try {
@@ -131,7 +133,7 @@ public class ConsoleDriver {
     /**
      * Handles employee registration flow via console prompts.
      */
-    public static void registrationUser() {
+    public static void registrationUser(boolean ownerAdding) {
         Company company = null;
         CompanyDAO companyDAO = new CompanyDAO();
         EmployeeDAO employeeDAO = new EmployeeDAO();
@@ -171,7 +173,14 @@ public class ConsoleDriver {
             } while (employeeDAO.existsByTIN(tin));
 
             String fullName = askStringValue("Enter full name", false);
-            String jobPosition = askStringValue("Enter job", false);
+            String jobPosition;
+            if (ownerAdding) {
+                jobPosition = "Owner";
+                System.out.println("Enter job: Owner");
+            }
+            else {
+                jobPosition = askStringValue("Enter job", false);
+            }
             String password = askStringValue("Enter password", false);
 
             Employee employee = new Employee(tin, password, fullName, jobPosition, company);
@@ -198,6 +207,7 @@ public class ConsoleDriver {
 
         if (!dao.existsByName(companyName)) {
             dao.insert(new Company(companyName));
+            registrationUser(true);
             System.out.println("\nCompany registered successful\n");
         } else {
             System.out.println("\nCompany with name " + companyName + " already exists\n");
