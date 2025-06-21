@@ -380,12 +380,11 @@ public class ConsoleDriver {
 
                 Document original = dao.readById(id);
                 printDocumentOverview(creator, original);
-                Document copy = editDocumentContent(original);
+                Document copy = editDocumentContent(new Document(original));
 
                 dao.insert(copy);
             }
             case LEAVE -> {
-                System.out.println("Here");
                 return;
             }
         }
