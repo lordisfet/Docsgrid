@@ -19,15 +19,28 @@ import static entities.user.BaseUser.PasswordUtils.hashPassword;
 import static entities.user.BaseUser.PasswordUtils.verifyPassword;
 import static validators.ConsoleValidator.*;
 
-
+/**
+ * ConsoleDriver serves as the main entry point for the DocsGrid application,
+ * handling user interactions via console menus for guests and employees.
+ */
 public class ConsoleDriver {
     // private static database ?
     // private static Repository repository ?
 
+    /**
+     * Main method launching the guest menu.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
         guestMenu();
     }
 
+    /**
+     * Creates a fake authorized Employee instance for demo/testing.
+     *
+     * @return a fake Employee or null if validation fails
+     */
     private static Employee fakeAuthorizeEmployee() {
         try {
             return new Employee("12345-174678-500", "1212", "Johny",
@@ -38,6 +51,9 @@ public class ConsoleDriver {
         }
     }
 
+    /**
+     * Displays the guest menu and handles sign up, login, and company registration.
+     */
     private static void guestMenu() {
         System.out.println("\n[DocsGrid]");
 
@@ -55,9 +71,7 @@ public class ConsoleDriver {
 
             action = GuestMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
-                case GuestMenuAction.SIGN_UP -> {
-                    registrationUser();
-                }
+                case GuestMenuAction.SIGN_UP -> registrationUser();
                 case GuestMenuAction.LOGIN -> {
                     Employee employee = loginUser();
                     try {
@@ -67,16 +81,18 @@ public class ConsoleDriver {
                         System.out.println("\nLogin with this TIN or/and password not exists");
                     }
                 }
-                case GuestMenuAction.REGISTER_COMPANY -> {
-                    registrationCompany();
-                }
-                case GuestMenuAction.EXIT -> {
-                    System.out.println("\nBye!");
-                }
+                case GuestMenuAction.REGISTER_COMPANY -> registrationCompany();
+                case GuestMenuAction.EXIT -> System.out.println("\nBye!");
             }
         } while (action != GuestMenuAction.EXIT);
     }
 
+    /**
+     * Displays the employee menu and handles document operations and logout.
+     *
+     * @param emp the logged-in Employee; must not be null
+     * @throws ConsoleDriverException if Employee is null
+     */
     private static void employeeMenu(Employee emp) {
         if (emp == null) {
             throw new ConsoleDriverException("Employee is null");
@@ -101,20 +117,20 @@ public class ConsoleDriver {
             action = EmployeeMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
                 case EmployeeMenuAction.CREATE_DOC -> {
-                    // ? -> select template -> filling data -> choose signatories -> this menu
                     System.out.println("\n----- Create new document -----");
                     createDocument(emp);
                 }
                 case EmployeeMenuAction.LIST_DOCS -> showDocumentsList(emp, true);
                 case EmployeeMenuAction.SHOW_UNSIGNED_DOCS -> showDocumentsList(emp, false);
                 case EmployeeMenuAction.SIGN_DOC -> signDocumentAction(emp);
-                case EmployeeMenuAction.LOG_OUT -> {
-                    System.out.println("Logging out...");
-                }
+                case EmployeeMenuAction.LOG_OUT -> System.out.println("Logging out...");
             }
         } while (action != EmployeeMenuAction.LOG_OUT);
     }
 
+    /**
+     * Handles employee registration flow via console prompts.
+     */
     public static void registrationUser() {
         Company company = null;
         CompanyDAO companyDAO = new CompanyDAO();
@@ -171,6 +187,9 @@ public class ConsoleDriver {
         System.out.println("Employee registered successful");
     }
 
+    /**
+     * Handles company registration flow via console prompts.
+     */
     public static void registrationCompany() {
         System.out.println("\n----- Company registration -----");
         String companyName = askStringValue("Enter company name", false);
@@ -185,8 +204,14 @@ public class ConsoleDriver {
         }
     }
 
+    /**
+     * Prompts user for login credentials and returns the authenticated employee.
+     *
+     * @return authenticated Employee or null
+     */
     public static Employee loginUser() {
         System.out.println("\n----- Employee login -----");
+
         String tin = askTINValue();
         String password = askStringValue("Enter password", false);
 
@@ -207,6 +232,9 @@ public class ConsoleDriver {
         }
     }
 
+    /**
+     * Displays all available document templates.
+     */
     private static void showAllDocumentTemplates() {
         DocumentTemplateDAO dao = new DocumentTemplateDAO();
         ArrayList<DocumentTemplate> templates = dao.readAll();
@@ -217,58 +245,80 @@ public class ConsoleDriver {
         }
     }
 
-    private static Document createDocument(Employee employee) {
-        DocumentTemplateDAO documentTemplateDAO = new DocumentTemplateDAO();
+    /**
+     * Guides the employee through document creation, adds signatories by TIN,
+     * persists the document, and returns the new Document.
+     *
+     * @param creator the Employee creating the document
+     * @return the persisted Document or null if creation is aborted
+     */
+    private static Document createDocument(Employee creator) {
+        DocumentTemplateDAO templateDAO = new DocumentTemplateDAO();
         DocumentDAO documentDAO = new DocumentDAO();
         EmployeeDAO employeeDAO = new EmployeeDAO();
 
-        DocumentTemplate documentTemplate;
-
+        DocumentTemplate template;
         int id;
-        int actionLenght = DocumentCreationMenuAction.values().length;
-        DocumentCreationMenuAction action;
+        int menuSize = DocumentCreationMenuAction.values().length;
+        DocumentCreationMenuAction action = null;
 
         do {
             showAllDocumentTemplates();
 
-            id = askIntegerValue("\nChoose document`s template by id");
-            documentTemplate = documentTemplateDAO.readById(id);
-            System.out.println('\n' + documentTemplate.getStructure());
+            id = askIntegerValue("\nChoose document's template by id");
+            template = templateDAO.readById(id);
+            if (template == null) {
+                System.out.println("Template not found. Try again.");
+                continue;
+            }
+            System.out.println("\nStructure: " + template.getStructure());
+            System.out.println("----- Document actions -----");
+            System.out.println("1) Select this template");
+            System.out.println("2) Exit from creation document");
 
-            System.out.println("""
-                    \n----- Document actions -----
-                    1) Select this template
-                    2) Exit from creation document
-                    """);
-//            2) Select other template
+            action = DocumentCreationMenuAction.values()[askIntegerValue("Document action", 1, menuSize) - 1];
+            if (action == DocumentCreationMenuAction.LEAVE) {
+                System.out.println("Leaving document creation...");
+                return null;
+            }
+        } while (action != DocumentCreationMenuAction.SELECT_THIS_TEMPLATE);
 
-            action = DocumentCreationMenuAction.values()[askIntegerValue("Document action", 1, actionLenght) - 1];
+        List<String> keys = template.getKeys();
+        System.out.println("\n----- Filling out the document -----");
+        Map<String, String> values = setValuesForDocument(keys);
 
-            switch (action) {
-                case SELECT_THIS_TEMPLATE -> {
-//                    FIXME: Now fields of document added for keys no in order how in document.
-//                     I guess we need use List for this.
-                    List<String> keys = documentTemplateDAO.readById(id).getKeys();
-                    List<Signatory> signatories = new ArrayList<>();
-                    signatories.add(new Signatory(employee, true));
+        List<Signatory> signatories = new ArrayList<>();
+        signatories.add(new Signatory(creator, true)); // creator signs automatically
 
-                    System.out.println("\n----- Filling out a document -----");
-                    Map<String, String> values = setValuesForDocument(keys);
-//                    TODO: Add adding signatory
-
-                    return new Document(documentTemplate, values, signatories);
-                }
-                case LEAVE -> {
-                    System.out.println("Leaving from document creation...");
-                }
-                default -> throw new IllegalStateException("Unexpected value: " + action);
+        System.out.println("\n----- Add additional signatories -----");
+        while (true) {
+            String tin = askStringValue("Enter signatory TIN (blank to finish)", true);
+            if (tin.isBlank()) break;
+            if (!employeeDAO.existsByTIN(tin)) {
+                System.out.println("No employee found with TIN: " + tin);
+                continue;
             }
 
-        } while (action != DocumentCreationMenuAction.LEAVE);
+            Employee emp = employeeDAO.readByTIN(tin);
+            if (emp == null) {
+                System.out.println("Error loading employee with TIN: " + tin);
+                continue;
+            }
+            signatories.add(new Signatory(emp, false));
+            System.out.println("Added signatory: " + emp.getFullName());
+        }
 
-        return null;
+        Document document = new Document(template, values, signatories);
+        documentDAO.insert(document);
+        System.out.println("Document created with ID: " + document.getId());
+        return document;
     }
 
+    /**
+     * Handles the sign document action for the employee.
+     *
+     * @param emp the Employee signing the document
+     */
     private static void signDocumentAction(Employee emp) {
         DocumentDAO documentDAO = new DocumentDAO();
 
@@ -312,6 +362,12 @@ public class ConsoleDriver {
         System.out.println("Document has been successfully signed!");
     }
 
+    /**
+     * Shows a list of documents filtered by sign status for the employee.
+     *
+     * @param employee the Employee viewing documents
+     * @param signed   true for signed, false for unsigned
+     */
     private static void showDocumentsList(Employee employee, boolean signed) {
         DocumentDAO documentDAO = new DocumentDAO();
         EmployeeDAO employeeDAO = new EmployeeDAO();
@@ -323,6 +379,13 @@ public class ConsoleDriver {
         }
     }
 
+    /**
+     * Builds representations of signatories' statuses for display.
+     *
+     * @param currEmployee current Employee context
+     * @param doc          Document for which to display signatories
+     * @return list of formatted signatory status strings
+     */
     private static List<String> getSignatoriesRepresentations(Employee currEmployee, Document doc) {
         List<String> signatoriesStatuses = new ArrayList<>();
         for (Signatory signatory : doc.getSignatories()) {
@@ -336,6 +399,12 @@ public class ConsoleDriver {
         return signatoriesStatuses;
     }
 
+    /**
+     * Prints an overview of the document including header, content, and sign status.
+     *
+     * @param currEmployee current Employee context
+     * @param doc          Document to display
+     */
     private static void printDocumentOverview(Employee currEmployee, Document doc) {
         List<String> signatoriesStatuses = getSignatoriesRepresentations(currEmployee, doc);
 

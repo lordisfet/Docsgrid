@@ -9,9 +9,20 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DAO for managing Signatory records in the database.
+ */
 public class SignatoryDAO {
     private final EmployeeDAO employeeDAO = new EmployeeDAO();
 
+    /**
+     * Inserts a new signatory row for the given document.
+     *
+     * @param documentId ID of the document
+     * @param signatory  Signatory to insert; must not be null
+     * @throws IllegalArgumentException if signatory is null
+     * @throws RuntimeException         on SQL errors
+     */
     public void insert(int documentId, Signatory signatory) {
         if (signatory == null) {
             throw new IllegalArgumentException("Signatory cannot be null");
@@ -29,6 +40,14 @@ public class SignatoryDAO {
         }
     }
 
+    /**
+     * Reads a signatory record by document and employee IDs.
+     *
+     * @param documentId ID of the document
+     * @param employeeId ID of the employee
+     * @return Signatory instance or null if not found
+     * @throws RuntimeException on SQL or validation errors
+     */
     public Signatory read(int documentId, int employeeId) {
         String sql = "SELECT sign_status FROM signatories WHERE document_id = ? AND employee_id = ?";
         try (Connection conn = DBConnection.connect();
@@ -47,6 +66,13 @@ public class SignatoryDAO {
         }
     }
 
+    /**
+     * Retrieves all signatories for a specific document.
+     *
+     * @param documentId ID of the document
+     * @return list of Signatory instances (empty if none)
+     * @throws RuntimeException on SQL or validation errors
+     */
     public List<Signatory> findByDocumentId(int documentId) {
         String sql = "SELECT employee_id, sign_status FROM signatories WHERE document_id = ?";
         List<Signatory> list = new ArrayList<>();
@@ -68,6 +94,13 @@ public class SignatoryDAO {
         return list;
     }
 
+    /**
+     * Updates the sign status for a given document and employee.
+     *
+     * @param documentId ID of the document
+     * @param signatory  Signatory with updated status
+     * @throws RuntimeException on SQL errors
+     */
     public void update(int documentId, Signatory signatory) {
         String sql = "UPDATE signatories SET sign_status = ? WHERE document_id = ? AND employee_id = ?";
         try (Connection conn = DBConnection.connect();
@@ -82,6 +115,12 @@ public class SignatoryDAO {
         }
     }
 
+    /**
+     * Deletes all signatories for a given document.
+     *
+     * @param documentId ID of the document
+     * @throws RuntimeException on SQL errors
+     */
     public void deleteByDocumentId(int documentId) {
         String sql = "DELETE FROM signatories WHERE document_id = ?";
         try (Connection conn = DBConnection.connect();
@@ -93,6 +132,13 @@ public class SignatoryDAO {
         }
     }
 
+    /**
+     * Deletes a specific signatory record.
+     *
+     * @param documentId ID of the document
+     * @param employeeId ID of the employee
+     * @throws RuntimeException on SQL errors
+     */
     public void delete(int documentId, int employeeId) {
         String sql = "DELETE FROM signatories WHERE document_id = ? AND employee_id = ?";
         try (Connection conn = DBConnection.connect();

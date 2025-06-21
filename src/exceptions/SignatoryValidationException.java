@@ -2,7 +2,15 @@ package exceptions;
 
 import java.security.PrivilegedActionException;
 
+/**
+ * Exception thrown when a Signatory entity fails validation.
+ */
 public class SignatoryValidationException extends RuntimeException {
+    /**
+     * Constructs a new SignatoryValidationException with the specified detail message.
+     *
+     * @param message the detail message explaining the validation failure
+     */
     public SignatoryValidationException(String message) {
         super(message);
     }

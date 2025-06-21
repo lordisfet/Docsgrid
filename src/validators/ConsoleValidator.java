@@ -2,16 +2,28 @@ package validators;
 
 import dao.CompanyDAO;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.regex.Pattern;
 
+/**
+ * Utility class for reading and validating console input values.
+ */
 public class ConsoleValidator {
+    /**
+     * Scanner for reading console input from the user.
+     */
     private static final Scanner scanner = new Scanner(System.in);
 
+    /**
+     * Prompts the user with a question and reads a string value.
+     *
+     * @param question   prompt text to display
+     * @param canBeBlank whether empty input is allowed
+     * @return entered string (may be empty if allowed)
+     */
     public static String askStringValue(String question, boolean canBeBlank) {
         String answer;
 
@@ -23,6 +35,13 @@ public class ConsoleValidator {
         return answer;
     }
 
+    /**
+     * Prompts the user with a question and reads an integer value.
+     * Repeats until a valid integer is entered.
+     *
+     * @param question prompt text to display
+     * @return parsed integer
+     */
     public static int askIntegerValue(String question) {
         while (true) {
             try {
@@ -34,6 +53,12 @@ public class ConsoleValidator {
         }
     }
 
+    /**
+     * Prompts the user to enter a TIN in format NNN-NN-NNNN.
+     * Repeats until a valid format is provided.
+     *
+     * @return validated TIN string
+     */
     public static String askTINValue() {
         String answer;
         final String TIN_FORMAT = "\\d{3}-\\d{2}-\\d{4}";
@@ -49,6 +74,12 @@ public class ConsoleValidator {
         return answer;
     }
 
+    /**
+     * Prompts the user to enter a date in yyyy-MM-dd format.
+     * Repeats until a valid date is parsed.
+     *
+     * @return date string in yyyy-MM-dd format
+     */
     public static String askDateValue() {
         String answer;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -65,6 +96,15 @@ public class ConsoleValidator {
         }
     }
 
+    /**
+     * Prompts the user for an integer within a specified range.
+     * Repeats until a valid integer is entered.
+     *
+     * @param question prompt text to display
+     * @param minValue minimum allowed value (inclusive)
+     * @param maxValue maximum allowed value (inclusive)
+     * @return validated integer within range
+     */
     public static int askIntegerValue(String question, int minValue, int maxValue) {
         while (true) {
             try {
@@ -81,6 +121,12 @@ public class ConsoleValidator {
         }
     }
 
+    /**
+     * Prompts the user to enter an email address.
+     * Validates basic email pattern.
+     *
+     * @return validated email string
+     */
     public static String askEmailValue() {
         String answer = askStringValue("Enter email", false);
         while (!answer.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
@@ -90,6 +136,12 @@ public class ConsoleValidator {
         return answer;
     }
 
+    /**
+     * Prompts the user to enter a numeric value (integer or decimal).
+     * Validates numeric format.
+     *
+     * @return validated number string
+     */
     public static String askNumberValue() {
         String answer = askStringValue("Enter number", false);
         while (!answer.matches("\\d+(\\.\\d+)?")) {
@@ -99,6 +151,12 @@ public class ConsoleValidator {
         return answer;
     }
 
+    /**
+     * Prompts the user to enter an existing company name.
+     * Checks existence via CompanyDAO.
+     *
+     * @return validated company name
+     */
     public static String askExistingCompanyName() {
         String companyName;
         CompanyDAO companyDAO = new CompanyDAO();
@@ -113,6 +171,13 @@ public class ConsoleValidator {
         return companyName;
     }
 
+    /**
+     * Prompts the user to set values for each document key according to its type.
+     * Supported types: TIN, date, email, number, companyName, default string.
+     *
+     * @param keys list of document field keys
+     * @return map of key to entered value
+     */
     public static Map<String, String> setValuesForDocument(List<String> keys) {
         Map<String, String> values = new HashMap<>();
 
@@ -148,6 +213,13 @@ public class ConsoleValidator {
         return values;
     }
 
+    /**
+     * Extracts the trailing capitalized word from a key to determine field type.
+     * Defaults to the full key if no match.
+     *
+     * @param key placeholder key
+     * @return extracted field type or original key
+     */
     private static String extractFieldType(String key) {
         var matcher = Pattern.compile("[A-Z][a-zA-Z]*$").matcher(key);
         return matcher.find() ? matcher.group() : key;

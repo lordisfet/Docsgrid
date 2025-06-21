@@ -14,11 +14,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DAO for CRUD operations on Document entities, including filtering by signatory.
+ */
 public class DocumentDAO implements GenericDAO<Document> {
     private final ObjectMapper mapper = new ObjectMapper();
     private final DocumentTemplateDAO templateDAO = new DocumentTemplateDAO();
     private final SignatoryDAO signatoryDAO = new SignatoryDAO();
 
+    /**
+     * Inserts a new Document and its associated Signatories.
+     *
+     * @param entity Document to insert; must not be null
+     * @throws IllegalArgumentException if entity is null
+     * @throws RuntimeException on SQL or serialization errors
+     */
     @Override
     public void insert(Document entity) {
         if (entity == null) {
@@ -49,6 +59,14 @@ public class DocumentDAO implements GenericDAO<Document> {
         }
     }
 
+    /**
+     * Reads a Document by its ID, including content and signatories.
+     *
+     * @param id ID of the Document; must be non-null and positive
+     * @return Document instance or null if not found
+     * @throws IllegalIdException if id is null or less than 1
+     * @throws RuntimeException on SQL, validation, or deserialization errors
+     */
     @Override
     public Document readById(Integer id) {
         if (id == null || id < 1) {
@@ -81,6 +99,15 @@ public class DocumentDAO implements GenericDAO<Document> {
         }
     }
 
+    /**
+     * Lists Documents for a given employee signatory and sign status.
+     *
+     * @param employeeId ID of the employee; must be non-null and positive
+     * @param signStatus desired sign status (true if signed)
+     * @return list of matching Documents (empty if none)
+     * @throws IllegalArgumentException if employeeId is null or less than 1
+     * @throws RuntimeException on SQL or serialization errors
+     */
     public List<Document> listBySignatoryEmployeeId(Integer employeeId, boolean signStatus) {
         if (employeeId == null || employeeId < 1) {
             throw new IllegalArgumentException("Document cannot be null");
@@ -121,6 +148,13 @@ public class DocumentDAO implements GenericDAO<Document> {
         }
     }
 
+    /**
+     * Updates the content of an existing Document and its signatories.
+     *
+     * @param entity Document to update; must not be null
+     * @throws IllegalArgumentException if entity is null
+     * @throws RuntimeException on SQL or serialization errors
+     */
     @Override
     public void update(Document entity) {
         if (entity == null) {
@@ -146,6 +180,13 @@ public class DocumentDAO implements GenericDAO<Document> {
         }
     }
 
+    /**
+     * Deletes a Document and all its signatories.
+     *
+     * @param entity Document to delete; must not be null
+     * @throws IllegalArgumentException if entity is null
+     * @throws RuntimeException on SQL errors
+     */
     @Override
     public void delete(Document entity) {
         if (entity == null) {
