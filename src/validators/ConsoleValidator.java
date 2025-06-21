@@ -185,7 +185,7 @@ public class ConsoleValidator {
             String fieldType = extractFieldType(key);
 
             String value;
-            switch (fieldType.toLowerCase()) {
+            switch (fieldType) {
                 case "tin":
                     value = ConsoleValidator.askTINValue("Enter TIN (" + key + ")");
                     break;
@@ -221,7 +221,7 @@ public class ConsoleValidator {
     public static Set<String> extractTINsFromData(Map<String, String> validData) {
         Set<String> TINs = new HashSet<>();
         for (String field : validData.keySet()) {
-            if (extractFieldType(field).equalsIgnoreCase("tin")) {
+            if (extractFieldType(field).equals("tin")) {
                 TINs.add(validData.get(field));
             }
         }
@@ -234,11 +234,12 @@ public class ConsoleValidator {
      * Defaults to the full key if no match.
      *
      * @param key placeholder key
-     * @return extracted field type or original key
+     * @return Lowercased extracted field type or original key
      */
     public static String extractFieldType(String key) {
         var matcher = Pattern.compile("[A-Z][a-zA-Z]*$").matcher(key);
-        return matcher.find() ? matcher.group() : key;
+        String res = matcher.find() ? matcher.group() : key;
+        return res.toLowerCase();
     }
 }
 
