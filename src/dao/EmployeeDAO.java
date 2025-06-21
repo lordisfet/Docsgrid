@@ -87,15 +87,7 @@ public class EmployeeDAO implements GenericDAO<Employee> {
         }
     }
 
-    /**
-     * Reads an employee by its TIN.
-     *
-     * @param TIN TIN, must be in NNN-NN-NNNN format.
-     * @return Employee instance or null if not found
-     * @throws UserValidationException Incorrect TIN
-     * @throws RuntimeException   on SQL errors
-     */
-    public Employee readByTIN(String TIN) {
+    /*public Employee readByTIN(String TIN) {
         if (TIN == null || TIN.isBlank()) {
             throw new UserValidationException("TIN cannot be null or blank");
         }
@@ -119,7 +111,7 @@ public class EmployeeDAO implements GenericDAO<Employee> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
+    }*/
 
     /**
      * Updates an existing employee.
@@ -206,10 +198,9 @@ public class EmployeeDAO implements GenericDAO<Employee> {
     }
 
     /**
-     * Reads an employee by TIN and password hash.
+     * Reads an employee by TIN.
      *
      * @param tin      Tax Identification Number; must not be null or blank
-     * @param password Password hash; must not be null or blank
      * @return Employee instance or null if not found
      * @throws IllegalArgumentException if password is null or blank
      * @throws RuntimeException         on SQL errors
@@ -217,7 +208,6 @@ public class EmployeeDAO implements GenericDAO<Employee> {
     public Employee readByTIN(String tin) {
         if (tin == null || tin.isBlank()) {
             throw new IllegalArgumentException("TIN cannot be null or empty");
-
         }
 
         String sql = "SELECT id, tin, full_name, password_hash, job, company_id FROM employees WHERE tin = ?";
