@@ -119,6 +119,7 @@ public class ConsoleDriver {
             action = EmployeeMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
                 case EmployeeMenuAction.CREATE_DOC -> {
+                    // ? -> select template -> filling data -> choose signatories -> this menu
                     System.out.println("\n----- Create new document -----");
                     createDocument(emp);
                 }
