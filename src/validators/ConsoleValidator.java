@@ -66,7 +66,7 @@ public class ConsoleValidator {
         System.out.println("TIN format is NNN-NN-NNNN. N is number from 0 to 9.");
         answer = askStringValue(question, true);
 
-        while (!answer.matches(TIN_FORMAT) && !answer.isBlank()) {
+        while (!answer.matches(TIN_FORMAT) || answer.isBlank()) {
             System.out.println("You entered a TIN which does not follow the format NNN-NN-NNNN. Try again");
             answer = askStringValue(question, true);
         }
@@ -187,7 +187,7 @@ public class ConsoleValidator {
             String value;
             switch (fieldType.toLowerCase()) {
                 case "tin":
-                    value = ConsoleValidator.askTINValue("Enter TIN");
+                    value = ConsoleValidator.askTINValue("Enter TIN (" + key + ")");
                     break;
                 case "date":
                     value = ConsoleValidator.askDateValue();
@@ -221,7 +221,7 @@ public class ConsoleValidator {
     public static Set<String> extractTINsFromData(Map<String, String> validData) {
         Set<String> TINs = new HashSet<>();
         for (String field : validData.keySet()) {
-            if (extractFieldType(field).equals("tin")) {
+            if (extractFieldType(field).equalsIgnoreCase("tin")) {
                 TINs.add(validData.get(field));
             }
         }

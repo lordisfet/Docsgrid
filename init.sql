@@ -55,14 +55,21 @@ VALUES
     ('222-11-3333', 'User', '$2a$12$8GwdKtF7e0G8d0pt7nieJuMtx3a3/uPgy6px.Af0.T.lZjI579T5a', 'Analyst', 1),
     ('000-00-0000','Max','$2a$12$s68zxc3699DhkUf4BpQcquEaO2uTy.golNYtCW9V1e.YrHuP5CONG','Java developer',1);
 
-INSERT INTO document_templates(structure, title) VALUES ('I, {{name1}}, hire person {{name2}} on the position {{job}}', 'Employment');
-INSERT INTO document_templates(structure, title) VALUES ('I, {{name1}}, sell {{sell_item}} to {{name2}} for {{amount}} USD', 'Sell Contract (USD)');
-INSERT INTO document_templates(structure, title) VALUES ('I, {{tin1}}, authorize the use of {{share_item}} to {{tin2}}', 'Sharing');
+INSERT INTO document_templates(structure, title) VALUES
+    ('I, {{name1}} (TIN: {{client1TIN}}), grant {{name2}} (TIN: {{client2TIN}}) the right to use {{resource}}', 'Usage Grant'),
+    ('I, {{name1}} (TIN: {{client1TIN}}), hire {{name2}} (TIN: {{client2TIN}}) on the position {{job}}', 'Employment'),
+    ('I, {{name1}} (TIN: {{client1TIN}}), lease {{property}} to {{name2}} (TIN: {{client2TIN}})', 'Lease Agreement'),
+    ('I, {{name1}} (TIN: {{client1TIN}}), sell {{item}} to {{name2}} (TIN: {{client2TIN}})', 'Sales Agreement'),
+    ('I, {{name1}} (TIN: {{client1TIN}}), appoint {{name2}} (TIN: {{client2TIN}}) as my attorney for {{purpose}}', 'Power of Attorney');
 
-INSERT INTO documents(template_id, content) VALUES (1, '{"name1":"Admin","name2":"User","job":"Analyst"}');
-INSERT INTO documents(template_id, content) VALUES (2, '{"name1":"User","name2":"Admin","sell_item":"BMW X5","amount":"20000"}');
+
+INSERT INTO documents(template_id, content) VALUES (1, '{"name1":"Admin","client1TIN":"111-22-3333","name2":"User","client2TIN":"222-11-3333","resource":"BMW X5"}');
+INSERT INTO documents(template_id, content) VALUES (1, '{"name1":"User","client1TIN":"222-11-3333","name2":"Admin","client2TIN":"111-22-3333","resource":"Mercedes GLS"}');
+INSERT INTO documents(template_id, content) VALUES (2, '{"name1":"Admin","client1TIN":"111-22-3333","name2":"User","client2TIN":"222-11-3333","job":"Analyst"}');
 
 INSERT INTO signatories(document_id, employee_id, sign_status) VALUES (1, 1, TRUE);
 INSERT INTO signatories(document_id, employee_id, sign_status) VALUES (1, 2, TRUE);
 INSERT INTO signatories(document_id, employee_id, sign_status) VALUES (2, 1, TRUE);
 INSERT INTO signatories(document_id, employee_id, sign_status) VALUES (2, 2, FALSE);
+INSERT INTO signatories(document_id, employee_id, sign_status) VALUES (3, 1, TRUE);
+INSERT INTO signatories(document_id, employee_id, sign_status) VALUES (3, 2, TRUE);
