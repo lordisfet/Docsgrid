@@ -87,32 +87,6 @@ public class EmployeeDAO implements GenericDAO<Employee> {
         }
     }
 
-    /*public Employee readByTIN(String TIN) {
-        if (TIN == null || TIN.isBlank()) {
-            throw new UserValidationException("TIN cannot be null or blank");
-        }
-
-        String sql = "SELECT id, tin, full_name, password_hash, job, company_id FROM employees WHERE tin = ?";
-        try (Connection conn = DBConnection.connect();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, TIN);
-
-            ResultSet rs = stmt.executeQuery();
-            CompanyDAO companyDAO = new CompanyDAO();
-            if (rs.next()) {}
-            return new Employee(
-                    rs.getInt("id"),
-                    rs.getString("tin"),
-                    rs.getString("password_hash"),
-                    rs.getString("full_name"),
-                    rs.getString("job"),
-                    new Company(companyDAO.readById(rs.getInt("company_id"))));
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }*/
-
     /**
      * Updates an existing employee.
      *
