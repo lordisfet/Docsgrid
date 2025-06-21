@@ -328,6 +328,9 @@ public class ConsoleDriver {
                     }
 
                     signatories.add(new Signatory(mentionedEmp, false));
+
+                    System.out.println("Signatory " + mentionedEmp.getFullName() + " (TIN: " + mentionedTIN + ") " +
+                            "has been automatically added");
                 }
 
                 System.out.println("\n----- Add additional signatories -----");
@@ -351,7 +354,7 @@ public class ConsoleDriver {
 
                     mentionedTINs.add(emp.getTIN());
                     signatories.add(new Signatory(emp, false));
-                    System.out.println("Added signatory: " + emp.getFullName());
+                    System.out.println("Added signatory: " + emp.getFullName() + " (TIN: " + emp.getTIN() + ") ");
                 }
 
                 Document document = new Document(template, values, signatories);
