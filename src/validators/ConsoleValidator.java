@@ -39,11 +39,11 @@ public class ConsoleValidator {
         final String TIN_FORMAT = "\\d{3}-\\d{2}-\\d{4}";
 
         System.out.println("TIN format is NNN-NN-NNNN. N is number from 0 to 9.");
-        answer = askStringValue("Enter TIN", false);
+        answer = askStringValue("Enter TIN", true);
 
-        while (!answer.matches(TIN_FORMAT)) {
+        while (!answer.matches(TIN_FORMAT) && !answer.isBlank()) {
             System.out.println("You entered a TIN which does not follow the format NNN-NN-NNNN. Try again");
-            answer = askStringValue("Enter TIN", false);
+            answer = askStringValue("Enter TIN", true);
         }
 
         return answer;

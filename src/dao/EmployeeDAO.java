@@ -2,15 +2,17 @@ package dao;
 
 import database.DBConnection;
 import entities.Company;
-import entities.abstracts.BaseEntity;
-import entities.user.BaseUser;
+
 import entities.user.Employee;
 import exceptions.IllegalIdException;
+import org.postgresql.util.PasswordUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import static entities.user.BaseUser.PasswordUtils.hashPassword;
 
 public class EmployeeDAO implements GenericDAO<Employee> {
     @Override
@@ -129,9 +131,9 @@ public class EmployeeDAO implements GenericDAO<Employee> {
         return false;
     }
 
-    public Employee readByTINandPasswordHash(String tin, String password) {
-        if (password == null || password.isBlank()) {
-            throw new IllegalArgumentException("password cannot be null or empty for exists statement");
+    public Employee readByTIN(String tin) {
+        if (tin == null || tin.isBlank()) {
+            throw new IllegalArgumentException("TIN cannot be null or empty");
         }
 
         String sql = "SELECT id, tin, full_name, password_hash, job, company_id FROM employees WHERE tin = ?";
@@ -142,13 +144,16 @@ public class EmployeeDAO implements GenericDAO<Employee> {
             ResultSet rs = stmt.executeQuery();
             CompanyDAO companyDAO = new CompanyDAO();
             if (rs.next()) {
-                return new Employee(
+                Employee employee = new Employee(
                         rs.getInt("id"),
                         rs.getString("tin"),
-                        rs.getString("password_hash"),
+                        "temp",
                         rs.getString("full_name"),
                         rs.getString("job"),
                         new Company(companyDAO.readById(rs.getInt("company_id"))));
+                employee.setPasswordHash(rs.getString("password_hash"));
+
+                return employee;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

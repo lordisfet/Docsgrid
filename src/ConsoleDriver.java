@@ -3,6 +3,7 @@ import entities.Company;
 import entities.Document;
 import entities.DocumentTemplate;
 import entities.Signatory;
+import entities.user.BaseUser;
 import entities.user.Employee;
 import exceptions.CompanyValidationException;
 import exceptions.ConsoleDriverException;
@@ -14,6 +15,8 @@ import menuAction.GuestMenuAction;
 import javax.print.Doc;
 import java.util.*;
 
+import static entities.user.BaseUser.PasswordUtils.hashPassword;
+import static entities.user.BaseUser.PasswordUtils.verifyPassword;
 import static validators.ConsoleValidator.*;
 
 
@@ -113,7 +116,7 @@ public class ConsoleDriver {
     }
 
     public static void registrationUser() {
-        Company company;
+        Company company = null;
         CompanyDAO companyDAO = new CompanyDAO();
         EmployeeDAO employeeDAO = new EmployeeDAO();
 
@@ -123,7 +126,9 @@ public class ConsoleDriver {
             String companyName;
 
             do {
-                companyName = askStringValue("Enter company name", true);
+//                TODO: I guess need to change "without company" on more non-realistic company name
+//                 and add trigger for add null value to DB
+                companyName = askStringValue("Enter company name or \"without company\"", true);
                 if (companyName.isBlank()) {
                     System.out.println("\nReturning...");
                     return;
@@ -145,7 +150,7 @@ public class ConsoleDriver {
                     return;
                 }
                 if (employeeDAO.existsByTIN(tin)) {
-                    System.out.println("Employee with this TIN:" + tin + " exists. Try else or login");
+                    System.out.println("Employee with this TIN: " + tin + " exists. Try else or login");
                 }
             } while (employeeDAO.existsByTIN(tin));
 
@@ -181,20 +186,25 @@ public class ConsoleDriver {
     }
 
     public static Employee loginUser() {
-        Employee employee;
-        EmployeeDAO employeeDAO = new EmployeeDAO();
-
         System.out.println("\n----- Employee login -----");
-
-        // NOTE: uncomment for real using
         String tin = askTINValue();
         String password = askStringValue("Enter password", false);
-        employee = employeeDAO.readByTINandPasswordHash(tin, password);
 
-        // NOTE: test data
-//        employee = employeeDAO.readByTINandPasswordHash("000-00-0000", "test");
+        EmployeeDAO dao = new EmployeeDAO();
+        Employee employee = dao.readByTIN(tin);
 
-        return employee;
+        if (employee == null) {
+            System.out.println("No user found with TIN " + tin);
+            return null;
+        }
+
+        if (BaseUser.PasswordUtils.verifyPassword(password, employee.getPasswordHash())) {
+            System.out.println("Login successful. Welcome, " + employee.getFullName());
+            return employee;
+        } else {
+            System.out.println("Incorrect password");
+            return null;
+        }
     }
 
     private static void showAllDocumentTemplates() {
@@ -226,7 +236,7 @@ public class ConsoleDriver {
             System.out.println('\n' + documentTemplate.getStructure());
 
             System.out.println("""
-                    ----- Document actions -----
+                    \n----- Document actions -----
                     1) Select this template
                     2) Exit from creation document
                     """);

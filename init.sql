@@ -16,7 +16,7 @@ CREATE TABLE employees (
     full_name      TEXT    NOT NULL,
     password_hash  TEXT    NOT NULL,
     job            TEXT    NOT NULL,
-    company_id     INTEGER NOT NULL
+    company_id     INTEGER -- can be null
         REFERENCES companies(id)
         ON DELETE RESTRICT
 );
@@ -47,6 +47,7 @@ CREATE TABLE signatories (
 );
 
 INSERT INTO companies(company_name) VALUES ('SSU');
+INSERT INTO companies(company_name) VALUES ('without company');
 
 INSERT INTO employees(tin, full_name, password_hash, job, company_id)
 VALUES ('111-22-3333', 'Admin', '$2a$12$0hehvRZgk9/t8BKxaNAvWuAAs.q67WlsmJ79gN6mUNEogmv7DZfe2', 'Owner', 1);
