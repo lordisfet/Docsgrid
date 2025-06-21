@@ -290,7 +290,7 @@ public class ConsoleDriver {
                     System.out.println("\t" + templates.get(i).getId() + ") " + templates.get(i).getTitle());
                 }
                 int lastTemplate = templates.getLast().getId();
-                System.out.println('\t' + lastTemplate + 1 + ") Leave");
+                System.out.println("\t" + (lastTemplate + 1) + ") Leave");
 
                 id = askIntegerValue("\nChoose document's template by id");
                 if (id == lastTemplate + 1) {
