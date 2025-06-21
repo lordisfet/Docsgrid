@@ -59,16 +59,16 @@ public class ConsoleValidator {
      *
      * @return validated TIN string
      */
-    public static String askTINValue() {
+    public static String askTINValue(String question) {
         String answer;
         final String TIN_FORMAT = "\\d{3}-\\d{2}-\\d{4}";
 
         System.out.println("TIN format is NNN-NN-NNNN. N is number from 0 to 9.");
-        answer = askStringValue("Enter TIN", true);
+        answer = askStringValue(question, true);
 
         while (!answer.matches(TIN_FORMAT) && !answer.isBlank()) {
             System.out.println("You entered a TIN which does not follow the format NNN-NN-NNNN. Try again");
-            answer = askStringValue("Enter TIN", true);
+            answer = askStringValue(question, true);
         }
 
         return answer;
@@ -187,7 +187,7 @@ public class ConsoleValidator {
             String value;
             switch (fieldType.toLowerCase()) {
                 case "tin":
-                    value = ConsoleValidator.askTINValue();
+                    value = ConsoleValidator.askTINValue("Enter TIN");
                     break;
                 case "date":
                     value = ConsoleValidator.askDateValue();
@@ -220,7 +220,7 @@ public class ConsoleValidator {
      * @param key placeholder key
      * @return extracted field type or original key
      */
-    private static String extractFieldType(String key) {
+    public static String extractFieldType(String key) {
         var matcher = Pattern.compile("[A-Z][a-zA-Z]*$").matcher(key);
         return matcher.find() ? matcher.group() : key;
     }
