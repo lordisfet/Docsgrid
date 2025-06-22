@@ -381,10 +381,8 @@ public class ConsoleDriver {
                     }
                 } while (!ids.contains(id));
 
-                Document original = dao.readById(id);
-                printDocumentOverview(creator, original);
-                Document copy = editDocumentContent(new Document(original));
-
+                printDocumentOverview(creator, dao.readById(id));
+                Document copy = editDocumentContent(dao.readById(id));
                 dao.insert(copy);
             }
             case LEAVE -> {
