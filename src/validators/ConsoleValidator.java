@@ -1,6 +1,7 @@
 package validators;
 
 import dao.CompanyDAO;
+import dao.EmployeeDAO;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -187,7 +188,14 @@ public class ConsoleValidator {
             String value;
             switch (fieldType) {
                 case "tin":
-                    value = ConsoleValidator.askTINValue("Enter TIN (" + key + ")");
+                    EmployeeDAO dao = new EmployeeDAO();
+                    do {
+                        value = ConsoleValidator.askTINValue("Enter TIN (" + key + ")");
+                        boolean empExists = dao.existsByTIN(value);
+                        if (!empExists) {
+                            System.out.println("Employee with this TIN not exists in our");
+                        }
+                    } while (!dao.existsByTIN(value));
                     break;
                 case "date":
                     value = ConsoleValidator.askDateValue();

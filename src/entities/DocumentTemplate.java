@@ -57,6 +57,19 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
         this.title = title;
     }
 
+    /**
+     * Constructs a {@code DocumentTemplate} instance with the specified structure and title.
+     * <p>
+     * This constructor validates both parameters to ensure they are neither {@code null} nor blank,
+     * then initializes the {@code structure}, {@code title}, and extracts placeholder keys
+     * from the structure using {@code validatePlaceholders}.
+     * </p>
+     *
+     * @param structure the template structure string containing placeholders
+     * @param title the title of the document template
+     * @throws DocumentTemplateValidationException if either {@code structure} or {@code title}
+     *         is {@code null} or blank
+     */
     public DocumentTemplate(String title, String structure) throws DocumentTemplateValidationException {
         if (title == null || title.isBlank()) {
             throw new DocumentTemplateValidationException("Title cannot be null or blank");

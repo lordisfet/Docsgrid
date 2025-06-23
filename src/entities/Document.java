@@ -132,6 +132,20 @@ public class Document extends BaseEntity {
         return content;
     }
 
+   /* public void setContent(Map<String, String> content) {
+        if (content == null) {
+            throw new DocumentValidationException("Content is empty");
+        }
+        this.content = content;
+    }*/
+
+    public void setSignatories(List<Signatory> signatories) {
+        if (signatories == null) {
+            throw new DocumentValidationException("Content is empty");
+        }
+        this.signatories = signatories;
+    }
+
     /**
      * Returns the list of signatories.
      *

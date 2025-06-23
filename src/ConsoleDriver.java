@@ -1,3 +1,26 @@
+/*
+Студенти: Костян О. В., Савченко М. О., Остапенко О. В., Коноплянченко Д. Є., Зуєва Х. В.
+Дисципліна: ООП на мові Java
+Проект на тему: "Патерн проектування Prototype. DocsGrid — система управління документами"
+
+Часу витрачено: 7 днів
+
+Це наша власна робота. Штучний інтелект  використовувався:
+Генерація шаблонів
+Генерація документації
+Пояснення можливої реалізації
+Пояснення для Bcrypt
+
+Опис програми:
+Дана програма призначена для роботи з патерном проектування
+Це система для управління документами, яка дозволяє:
+Реєструвати компанії та співробітників
+Створювати документи на основі шаблонів
+Додавати підписантів до документів
+Підписувати документи
+Переглядати список підписаних та непідписаних документів
+*/
+
 import dao.*;
 import entities.Company;
 import entities.Document;
@@ -125,14 +148,18 @@ public class ConsoleDriver {
 
         do {
             System.out.println("\n----- Menu -----");
-            System.out.println("1) Create new document");
-            System.out.println("2) List signed documents");
-            System.out.println("3) Show unsigned documents");
-            System.out.println("4) Sign document");
-            System.out.println("5) Log out\n");
+            System.out.println("1) Who");
+            System.out.println("2) Create new document");
+            System.out.println("3) List signed documents");
+            System.out.println("4) Show unsigned documents");
+            System.out.println("5) Sign document");
+            System.out.println("6) Log out\n");
 
             action = EmployeeMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
+                case WHO -> {
+                    System.out.println(emp);
+                }
                 case EmployeeMenuAction.CREATE_DOC -> {
                     createDocument(emp);
                 }
@@ -378,6 +405,7 @@ public class ConsoleDriver {
 
                     Employee mentionedEmp = employeeDAO.readByTIN(mentionedTIN);
                     if (mentionedEmp == null) {
+                        System.out.println("Signatory with this TIN not exists. We cannot add him");
                         continue;
                     }
 
@@ -413,7 +441,7 @@ public class ConsoleDriver {
 
                 Document document = new Document(template, values, signatories);
                 documentDAO.insert(document);
-                System.out.println("Document created with ID: " + document.getId());
+                System.out.println("\nDocument created with ID: " + document.getId());
             }
             case CREATE_BASED_ON -> {
                 DocumentDAO dao = new DocumentDAO();
@@ -435,8 +463,28 @@ public class ConsoleDriver {
                     }
                 } while (!ids.contains(id));
 
+                List<Signatory> signatories = new ArrayList<>();
                 printDocumentOverview(creator, dao.readById(id));
                 Document copy = editDocumentContent(dao.readById(id));
+                Set<String> mentionedTINs = extractTINsFromData(copy.getContent());
+                for (String mentionedTIN : mentionedTINs) {
+                    if (mentionedTIN == null || mentionedTIN.isBlank() || creator.getTIN().equals(mentionedTIN)) {
+                        continue;
+                    }
+
+                    Employee mentionedEmp = employeeDAO.readByTIN(mentionedTIN);
+                    if (mentionedEmp == null) {
+                        System.out.println("Signatory with this TIN not exists. We cannot add him");
+                        continue;
+                    }
+
+                    signatories.add(new Signatory(mentionedEmp, false));
+
+                    System.out.println("Signatory " + mentionedEmp.getFullName() + " (TIN: " + mentionedTIN + ") " +
+                            "has been automatically added");
+                }
+
+                copy.setSignatories(signatories);
                 dao.insert(copy);
             }
             case LEAVE -> {
