@@ -12,14 +12,10 @@ import exceptions.UserValidationException;
 import menuAction.DocumentCreationMenuAction;
 import menuAction.EmployeeMenuAction;
 import menuAction.GuestMenuAction;
-import org.mindrot.jbcrypt.BCrypt;
 import validators.ConsoleValidator;
 
-import javax.print.Doc;
 import java.util.*;
 
-import static entities.user.BaseUser.PasswordUtils.hashPassword;
-import static entities.user.BaseUser.PasswordUtils.verifyPassword;
 import static validators.ConsoleValidator.*;
 
 /**
@@ -27,8 +23,6 @@ import static validators.ConsoleValidator.*;
  * handling user interactions via console menus for guests and employees.
  */
 public class ConsoleDriver {
-    // private static database ?
-    // private static Repository repository ?
 
     /**
      * Main method launching the guest menu.
