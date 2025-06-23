@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Represents a document based on a template, with content data and signatories.
  */
-public class Document extends BaseEntity {
+public class Document extends BaseEntity implements Cloneable {
     private final DocumentTemplate template;
     private Map<String, String> content;
     private List<Signatory> signatories;
@@ -202,5 +202,40 @@ public class Document extends BaseEntity {
                 ", content=" + content +
                 ", signatories=" + signatories +
                 '}';
+    }
+
+    /**
+     * Creates a deep copy of this {@code Document} instance.
+     * <p>
+     * This method overrides {@code Object.clone()} and performs cloning of
+     * the {@code content} map and {@code signatories} list to ensure that
+     * the cloned document is independent from the original. If {@code content}
+     * or {@code signatories} are {@code null}, they will be skipped.
+     * </p>
+     *
+     * @return a cloned {@code Document} object with deep-copied fields
+     * @throws AssertionError if the cloning operation is not supported
+     */
+    @Override
+    public Document clone() {
+        try {
+            Document clone = (Document) super.clone();
+
+            if (this.content != null) {
+                clone.content = new HashMap<>(this.content);
+            }
+
+            if (this.signatories != null) {
+                List<Signatory> clonedSignatories = new ArrayList<>();
+                for (Signatory s : this.signatories) {
+                    clonedSignatories.add(new Signatory(s));
+                }
+                clone.signatories = clonedSignatories;
+            }
+
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Cloning failed", e);
+        }
     }
 }
