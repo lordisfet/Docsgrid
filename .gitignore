@@ -30,3 +30,4 @@ bin/
 .DS_Store
 
 src/database/DBConnection.java
+src/database/schemaDDL.sql

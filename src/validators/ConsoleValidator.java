@@ -1,6 +1,7 @@
 package validators;
 
 import dao.CompanyDAO;
+import dao.EmployeeDAO;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -66,7 +67,7 @@ public class ConsoleValidator {
         System.out.println("TIN format is NNN-NN-NNNN. N is number from 0 to 9.");
         answer = askStringValue(question, true);
 
-        while (!answer.matches(TIN_FORMAT) && !answer.isBlank()) {
+        while (!answer.matches(TIN_FORMAT) || answer.isBlank()) {
             System.out.println("You entered a TIN which does not follow the format NNN-NN-NNNN. Try again");
             answer = askStringValue(question, true);
         }
@@ -185,9 +186,16 @@ public class ConsoleValidator {
             String fieldType = extractFieldType(key);
 
             String value;
-            switch (fieldType.toLowerCase()) {
+            switch (fieldType) {
                 case "tin":
-                    value = ConsoleValidator.askTINValue("Enter TIN");
+                    EmployeeDAO dao = new EmployeeDAO();
+                    do {
+                        value = ConsoleValidator.askTINValue("Enter TIN (" + key + ")");
+                        boolean empExists = dao.existsByTIN(value);
+                        if (!empExists) {
+                            System.out.println("Employee with this TIN not exists in our");
+                        }
+                    } while (!dao.existsByTIN(value));
                     break;
                 case "date":
                     value = ConsoleValidator.askDateValue();
@@ -214,15 +222,32 @@ public class ConsoleValidator {
     }
 
     /**
+     * Extract TINs from data after setValuesForDocument handling
+     * @param validData data after setValuesForDocument handling
+     * @return Set with TINs
+     */
+    public static Set<String> extractTINsFromData(Map<String, String> validData) {
+        Set<String> TINs = new HashSet<>();
+        for (String field : validData.keySet()) {
+            if (extractFieldType(field).equals("tin")) {
+                TINs.add(validData.get(field));
+            }
+        }
+
+        return TINs;
+    }
+
+    /**
      * Extracts the trailing capitalized word from a key to determine field type.
      * Defaults to the full key if no match.
      *
      * @param key placeholder key
-     * @return extracted field type or original key
+     * @return Lowercased extracted field type or original key
      */
     public static String extractFieldType(String key) {
         var matcher = Pattern.compile("[A-Z][a-zA-Z]*$").matcher(key);
-        return matcher.find() ? matcher.group() : key;
+        String res = matcher.find() ? matcher.group() : key;
+        return res.toLowerCase();
     }
 }
 

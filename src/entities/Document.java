@@ -132,6 +132,20 @@ public class Document extends BaseEntity implements Cloneable {
         return content;
     }
 
+   /* public void setContent(Map<String, String> content) {
+        if (content == null) {
+            throw new DocumentValidationException("Content is empty");
+        }
+        this.content = content;
+    }*/
+
+    public void setSignatories(List<Signatory> signatories) {
+        if (signatories == null) {
+            throw new DocumentValidationException("Content is empty");
+        }
+        this.signatories = signatories;
+    }
+
     /**
      * Returns the list of signatories.
      *
@@ -145,17 +159,13 @@ public class Document extends BaseEntity implements Cloneable {
      * Marks the document as signed by the specified employee.
      *
      * @param emp employee who signs the document
-     * @return true if the employee was a signatory and is now signed, false otherwise
      */
-    public boolean signByEmployee(Employee emp) {
+    public void signByEmployee(Employee emp) {
         for (Signatory signatory : signatories) {
             if (signatory.getEmployee().getId().equals(emp.getId())) {
                 signatory.setSignStatus(true);
-                return true;
             }
         }
-
-        return false;
     }
 
     /**
