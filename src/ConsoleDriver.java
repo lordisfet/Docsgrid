@@ -171,6 +171,23 @@ public class ConsoleDriver {
         } while (action != EmployeeMenuAction.LOG_OUT);
     }
 
+    /**
+     * Displays the administrative menu for managing document templates via console input.
+     * <p>
+     * Provides the following options:
+     * <ul>
+     *   <li><b>Create document template</b>: prompts the user to enter a template title and structure,
+     *       validates input, and persists the template using {@code DocumentTemplateDAO}.</li>
+     *   <li><b>Edit document template</b>: currently a placeholder for future implementation.</li>
+     *   <li><b>Log out</b>: exits the menu loop.</li>
+     * </ul>
+     * <p>
+     * The method interacts with the user through console prompts, performs input validation,
+     * and loops until the admin selects the "Log out" option.
+     * </p>
+     *
+     * @throws DocumentTemplateValidationException if the template input is invalid during creation
+     */
     public static void adminMenu() {
         System.out.println("\nYou are admin. congratulation!!!\n");
 
