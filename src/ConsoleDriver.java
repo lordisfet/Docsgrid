@@ -481,8 +481,10 @@ public class ConsoleDriver {
                 } while (!ids.contains(id));
 
                 List<Signatory> signatories = new ArrayList<>();
-                printDocumentOverview(creator, dao.readById(id));
-                Document copy = editDocumentContent(dao.readById(id));
+                Document original = dao.readById(id);
+                printDocumentOverview(creator, original);
+                Document copy = editDocumentContent(original.clone());
+                signatories.add(new Signatory(creator, true)); // creator signs automatically
                 Set<String> mentionedTINs = extractTINsFromData(copy.getContent());
                 for (String mentionedTIN : mentionedTINs) {
                     if (mentionedTIN == null || mentionedTIN.isBlank() || creator.getTIN().equals(mentionedTIN)) {
