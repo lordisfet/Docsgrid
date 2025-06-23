@@ -152,6 +152,17 @@ public class Employee extends BaseUser {
         this.company = company;
     }
 
+    /**
+     * Compares this {@code Employee} to the specified object for equality.
+     * <p>
+     * Returns {@code true} if the given object is also an {@code Employee} and its
+     * {@code fullName}, {@code jobPosition}, and {@code company} are equal to those of this instance.
+     * Also delegates to {@code super.equals} to compare base-class fields.
+     * </p>
+     *
+     * @param o the object to compare with
+     * @return {@code true} if the given object represents the same employee; {@code false} otherwise
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -162,17 +173,34 @@ public class Employee extends BaseUser {
                 && Objects.equals(company, employee.company);
     }
 
+    /**
+     * Returns a hash code value for this {@code Employee}.
+     * <p>
+     * The hash code is based on {@code fullName}, {@code jobPosition}, {@code company},
+     * and the result of {@code super.hashCode()}.
+     * </p>
+     *
+     * @return a hash code value for this object
+     */
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), fullName, jobPosition, company);
     }
 
+    /**
+     * Returns a string representation of the {@code Employee}.
+     * <p>
+     * The format includes the full name, job position, and the name of the associated company.
+     * Useful for logging and debugging.
+     * </p>
+     *
+     * @return a string describing this {@code Employee}
+     */
     @Override
     public String toString() {
-        return super.toString() + "Employee{" +
-                "fullName='" + fullName + '\'' +
-                ", jobPosition='" + jobPosition + '\'' +
-                ", company=" + company +
-                '}';
+        return "Employee:\n" +
+                "  Full Name   : " + fullName + "\n" +
+                "  Job Position: " + jobPosition + "\n" +
+                "  Company     : " + company.getCompanyName();
     }
 }

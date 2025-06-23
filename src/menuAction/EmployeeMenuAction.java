@@ -4,6 +4,7 @@ package menuAction;
  * Enum for employee menu actions
  */
 public enum EmployeeMenuAction {
+    WHO,
     CREATE_DOC,
     LIST_DOCS,
     SHOW_UNSIGNED_DOCS,

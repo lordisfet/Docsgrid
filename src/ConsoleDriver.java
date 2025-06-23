@@ -1,3 +1,26 @@
+/*
+Студенти: Костян О. В., Савченко М. О., Остапенко О. В., Коноплянченко Д. Є., Зуєва Х. В.
+Дисципліна: ООП на мові Java
+Проект на тему: "Патерн проектування Prototype. DocsGrid — система управління документами"
+
+Часу витрачено: 7 днів
+
+Це наша власна робота. Штучний інтелект  використовувався:
+Генерація шаблонів
+Генерація документації
+Пояснення можливої реалізації
+Пояснення для Bcrypt
+
+Опис програми:
+Дана програма призначена для роботи з патерном проектування
+Це система для управління документами, яка дозволяє:
+Реєструвати компанії та співробітників
+Створювати документи на основі шаблонів
+Додавати підписантів до документів
+Підписувати документи
+Переглядати список підписаних та непідписаних документів
+*/
+
 import dao.*;
 import entities.Company;
 import entities.Document;
@@ -7,15 +30,20 @@ import entities.user.BaseUser;
 import entities.user.Employee;
 import exceptions.CompanyValidationException;
 import exceptions.ConsoleDriverException;
+import exceptions.DocumentTemplateValidationException;
 import exceptions.UserValidationException;
 
+import menuAction.AdminMenuAction;
 import menuAction.DocumentCreationMenuAction;
 import menuAction.EmployeeMenuAction;
 import menuAction.GuestMenuAction;
+import org.postgresql.util.PasswordUtil;
 import validators.ConsoleValidator;
 
 import java.util.*;
 
+import static entities.user.BaseUser.PasswordUtils.hashPassword;
+import static entities.user.BaseUser.PasswordUtils.verifyPassword;
 import static validators.ConsoleValidator.*;
 
 /**
@@ -63,8 +91,9 @@ public class ConsoleDriver {
             System.out.println("\n----- Guest -----");
             System.out.println("1) Sign up");
             System.out.println("2) Log in");
-            System.out.println("3) Register Company");
-            System.out.println("4) Exit\n");
+            System.out.println("3) Log in how admin");
+            System.out.println("4) Register Company");
+            System.out.println("5) Exit\n");
 
             action = GuestMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
@@ -78,6 +107,18 @@ public class ConsoleDriver {
                         System.out.println("\nLogin was successful");
                     } catch (ConsoleDriverException e) {
                         System.out.println("\nLogin with this TIN or/and password not exists");
+                    }
+                }
+                case LOGIN_ADMIN -> {
+                    String login = askStringValue("Enter admin login", false);
+                    String password = askStringValue("Enter admin password", false);
+/*                    String login = "admin";
+                    String password = "123";*/
+
+                    if (login.equals("admin") && verifyPassword(password, hashPassword("123"))) {
+                        adminMenu();
+                    } else {
+                        System.out.println("\nNon correct data to logging how admin");
                     }
                 }
                 case GuestMenuAction.REGISTER_COMPANY -> registrationCompany();
@@ -107,14 +148,18 @@ public class ConsoleDriver {
 
         do {
             System.out.println("\n----- Menu -----");
-            System.out.println("1) Create new document");
-            System.out.println("2) List signed documents");
-            System.out.println("3) Show unsigned documents");
-            System.out.println("4) Sign document");
-            System.out.println("5) Log out\n");
+            System.out.println("1) Who");
+            System.out.println("2) Create new document");
+            System.out.println("3) List signed documents");
+            System.out.println("4) Show unsigned documents");
+            System.out.println("5) Sign document");
+            System.out.println("6) Log out\n");
 
             action = EmployeeMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
+                case WHO -> {
+                    System.out.println(emp);
+                }
                 case EmployeeMenuAction.CREATE_DOC -> {
                     createDocument(emp);
                 }
@@ -124,6 +169,48 @@ public class ConsoleDriver {
                 case EmployeeMenuAction.LOG_OUT -> System.out.println("Logging out...");
             }
         } while (action != EmployeeMenuAction.LOG_OUT);
+    }
+
+    public static void adminMenu() {
+        System.out.println("\nYou are admin. congratulation!!!\n");
+
+        System.out.println("""
+                ----- Admin menu -----
+                1) Create document template
+                2) Edit document template
+                3) Log out""");
+
+        int actionLength = AdminMenuAction.values().length;
+        AdminMenuAction action;
+        do {
+            action = AdminMenuAction.values()
+                    [askIntegerValue("\nWhat are you want do", 1, actionLength) - 1];
+            switch (action) {
+                case CREATE_TEMPLATE -> {
+                    System.out.println("\n----- Document template creating -----");
+                    String title = askStringValue("Enter tempalte title", false);
+                    System.out.println("The document contains keys under {{adminName}}." +
+                            "\nEach key follows this structure: whose <admin> + which <Name>");
+
+                    DocumentTemplateDAO dao = new DocumentTemplateDAO();
+                    DocumentTemplate documentTemplate = null;
+                    do {
+                        try {
+                            String structure = askStringValue("Enter structure", false);
+                            documentTemplate = new DocumentTemplate(title, structure);
+                            System.out.println("\nNext template was added:\n" + documentTemplate);
+                            dao.insert(documentTemplate);
+                        } catch (DocumentTemplateValidationException e) {
+                            System.out.println("\nCreating template: " + e.getMessage());
+                        }
+                    } while (documentTemplate == null);
+                }
+                case EDIT_TEMPLATE -> {
+                    System.out.println("\nSoon");
+                }
+                case LOG_OUT -> System.out.println("Logging out...");
+            }
+        } while (action != AdminMenuAction.LOG_OUT);
     }
 
     /**
@@ -232,7 +319,7 @@ public class ConsoleDriver {
             return null;
         }
 
-        if (BaseUser.PasswordUtils.verifyPassword(password, employee.getPasswordHash())) {
+        if (verifyPassword(password, employee.getPasswordHash())) {
             System.out.println("Login successful. Welcome, " + employee.getFullName());
             return employee;
         } else {
@@ -318,6 +405,7 @@ public class ConsoleDriver {
 
                     Employee mentionedEmp = employeeDAO.readByTIN(mentionedTIN);
                     if (mentionedEmp == null) {
+                        System.out.println("Signatory with this TIN not exists. We cannot add him");
                         continue;
                     }
 
@@ -353,7 +441,7 @@ public class ConsoleDriver {
 
                 Document document = new Document(template, values, signatories);
                 documentDAO.insert(document);
-                System.out.println("Document created with ID: " + document.getId());
+                System.out.println("\nDocument created with ID: " + document.getId());
             }
             case CREATE_BASED_ON -> {
                 DocumentDAO dao = new DocumentDAO();
@@ -375,8 +463,28 @@ public class ConsoleDriver {
                     }
                 } while (!ids.contains(id));
 
+                List<Signatory> signatories = new ArrayList<>();
                 printDocumentOverview(creator, dao.readById(id));
                 Document copy = editDocumentContent(dao.readById(id));
+                Set<String> mentionedTINs = extractTINsFromData(copy.getContent());
+                for (String mentionedTIN : mentionedTINs) {
+                    if (mentionedTIN == null || mentionedTIN.isBlank() || creator.getTIN().equals(mentionedTIN)) {
+                        continue;
+                    }
+
+                    Employee mentionedEmp = employeeDAO.readByTIN(mentionedTIN);
+                    if (mentionedEmp == null) {
+                        System.out.println("Signatory with this TIN not exists. We cannot add him");
+                        continue;
+                    }
+
+                    signatories.add(new Signatory(mentionedEmp, false));
+
+                    System.out.println("Signatory " + mentionedEmp.getFullName() + " (TIN: " + mentionedTIN + ") " +
+                            "has been automatically added");
+                }
+
+                copy.setSignatories(signatories);
                 dao.insert(copy);
             }
             case LEAVE -> {
