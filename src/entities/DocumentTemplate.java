@@ -57,6 +57,19 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
         this.title = title;
     }
 
+    public DocumentTemplate(String title, String structure) throws DocumentTemplateValidationException {
+        if (title == null || title.isBlank()) {
+            throw new DocumentTemplateValidationException("Title cannot be null or blank");
+        }
+        if (structure == null || structure.isBlank()) {
+            throw new DocumentTemplateValidationException("Structure cannot be null or blank");
+        }
+
+        this.keys = validatePlaceholders(structure);
+        this.structure = structure;
+        this.title = title;
+    }
+
     /**
      * Copy constructor.
      * Creates a deep copy of keys list.
@@ -174,6 +187,16 @@ public class DocumentTemplate extends BaseEntity implements Cloneable {
         }
     }
 
+    /**
+     * Returns a string representation of the {@code DocumentTemplate} object.
+     * <p>
+     * The returned string includes the values of the {@code title}, {@code structure},
+     * and {@code keys} fields, formatted in a concise and readable form.
+     * Useful for debugging and logging.
+     * </p>
+     *
+     * @return a string describing the current state of this {@code DocumentTemplate}
+     */
     @Override
     public String toString() {
         return "DocumentTemplate{" +
