@@ -158,7 +158,7 @@ public class ConsoleDriver {
             action = EmployeeMenuAction.values()[askIntegerValue("Action", 1, actionsLength) - 1];
             switch (action) {
                 case WHO -> {
-                    System.out.println(emp);
+                    System.out.println("\n" + emp);
                 }
                 case EmployeeMenuAction.CREATE_DOC -> {
                     createDocument(emp);
